@@ -1,0 +1,68 @@
+.verdict {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-5);
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  color: #fff;
+}
+
+.etanol {
+  background: var(--accent);
+}
+
+.gasolina {
+  background: var(--info);
+}
+
+.indefinido {
+  background: var(--muted);
+}
+
+.verdictLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.winner {
+  margin-top: 6px;
+  font-size: clamp(30px, 8vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.explanation {
+  margin-top: var(--space-2);
+  font-size: 14px;
+  opacity: 0.92;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: var(--space-4);
+  margin-top: 18px;
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+}
+
+.detailLabel {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.detailValue {
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 700;
+}

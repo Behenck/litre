@@ -1,0 +1,22 @@
+/**
+ * Temas. O atributo `data-theme` é escrito no <html> pelo servidor a partir do
+ * cookie, então a primeira pintura já sai na cor certa — sem flash.
+ */
+
+[data-theme='escuro'] {
+  --bg: #0c0e10;
+  --panel: #15181b;
+  --panel-2: #1b1f23;
+  --line: #262b30;
+  --fg: #eceff2;
+  --muted: #8b939b;
+  --accent: #0e8f6e;
+  --accent-fg: #06110c;
+  --accent-strong: #14b389;
+  --soft: #12251e;
+  --danger: #ef6a6a;
+  --info: #5b9be0;
+
+  --shadow-card: 0 14px 34px rgb(0 0 0 / 45%);
+  --shadow-toast: 0 12px 30px rgb(0 0 0 / 55%);
+}

@@ -1,0 +1,49 @@
+/**
+ * Tokens de design — transpostos de design-model/Litro.dc.html.
+ * Nenhum componente declara cor literal: tudo passa por estas variáveis.
+ */
+
+:root {
+  /* Tema claro é o padrão; themes.css sobrescreve no escuro. */
+  --bg: #f3f3f1;
+  --panel: #ffffff;
+  --panel-2: #fafaf8;
+  --line: #e5e5e0;
+  --fg: #14161a;
+  --muted: #71757c;
+  --accent: #0e8f6e;
+  --accent-fg: #ffffff;
+  --accent-strong: #0b6e3c;
+  --soft: #eaf6f1;
+  --danger: #d14343;
+  --info: #1f5fa8;
+
+  /* Tipografia — as variáveis de fonte vêm do next/font no <html>. */
+  --font-sans: var(--font-space-grotesk), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, 'SF Mono', monospace;
+
+  /* Raios */
+  --radius-sm: 7px;
+  --radius-md: 11px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 99px;
+
+  /* Espaçamentos */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 22px;
+  --space-6: 28px;
+
+  /* Layout */
+  --content-max: 1120px;
+  --control-height: 44px;
+
+  /* Elevação e movimento */
+  --shadow-card: 0 14px 34px rgb(0 0 0 / 9%);
+  --shadow-toast: 0 12px 30px rgb(0 0 0 / 22%);
+  --transition-fast: 0.18s ease;
+  --transition-base: 0.25s ease;
+}

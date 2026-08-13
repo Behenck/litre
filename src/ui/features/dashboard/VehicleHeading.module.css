@@ -1,0 +1,32 @@
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  margin-right: auto;
+}
+
+.swatch {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgb(0 0 0 / 12%);
+}
+
+.text {
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(21px, 5vw, 26px);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.meta {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}

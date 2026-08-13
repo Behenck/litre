@@ -1,0 +1,43 @@
+.panel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+  padding: var(--space-4) 18px;
+  border-radius: var(--radius-lg);
+  background: var(--soft);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.block:first-child {
+  margin-right: auto;
+}
+
+.right {
+  text-align: right;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.price {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+}
+
+.distance {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 600;
+}

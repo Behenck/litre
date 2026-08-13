@@ -1,0 +1,11 @@
+.inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
+  gap: var(--space-4);
+}
+
+.basis {
+  margin: var(--space-4) 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}

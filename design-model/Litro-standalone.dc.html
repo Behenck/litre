@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin:0; padding:0; }
+  * { box-sizing: border-box; }
+  input, select, button, textarea { font-family: inherit; }
+  input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+  a { color:#0E8F6E; text-decoration:none; }
+  a:hover { color:#0B6E3C; }
+  ::selection { background:#0E8F6E; color:#fff; }
+  @keyframes riseIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+  @keyframes toastIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform:none; } }
+</style>
+</helmet>
+
+<div style="--bg:{{ c.bg }}; --panel:{{ c.panel }}; --panel2:{{ c.panel2 }}; --line:{{ c.line }}; --fg:{{ c.fg }}; --muted:{{ c.muted }}; --accent:{{ c.accent }}; --accentFg:{{ c.accentFg }}; --soft:{{ c.soft }}; min-height:100vh; background:var(--bg,#F3F3F1); color:var(--fg,#14161A); font-family:'Space Grotesk',system-ui,sans-serif; -webkit-font-smoothing:antialiased; transition:background .25s ease, color .25s ease">
+
+  <header style="position:sticky; top:0; z-index:20; backdrop-filter:blur(12px); background:var(--panel,#fff); border-bottom:1px solid var(--line,#E5E5E0)">
+    <div style="max-width:1120px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:16px">
+      <div style="display:flex; align-items:center; gap:10px; margin-right:auto">
+        <div style="width:30px; height:30px; border-radius:9px; background:var(--accent,#0E8F6E); display:grid; place-items:center; color:var(--accentFg,#fff); font-weight:700; font-size:15px; letter-spacing:-.02em">L</div>
+        <div style="display:flex; flex-direction:column; line-height:1.1">
+          <span style="font-weight:600; font-size:16px; letter-spacing:-.02em">Litro</span>
+          <span style="font-size:11px; color:var(--muted,#71757C)">média de consumo</span>
+        </div>
+      </div>
+      <button onClick="{{ toggleTheme }}" title="Alternar tema" style="height:36px; padding:0 14px; border-radius:99px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:13px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:8px" style-hover="border-color:var(--accent,#0E8F6E)">
+        <span style="font-size:13px">{{ themeIcon }}</span><span>{{ themeLabel }}</span>
+      </button>
+    </div>
+    <div style="max-width:1120px; margin:0 auto; padding:0 20px 12px; display:flex; gap:8px; overflow-x:auto">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="6">
+        <button onClick="{{ n.go }}" style="flex:0 0 auto; height:34px; padding:0 15px; border-radius:99px; border:1px solid {{ n.bd }}; background:{{ n.bg }}; color:{{ n.fg }}; font-size:13px; font-weight:500; cursor:pointer; white-space:nowrap; transition:all .18s ease">{{ n.label }}</button>
+      </sc-for>
+    </div>
+  </header>
+
+  <main style="max-width:1120px; margin:0 auto; padding:28px 20px 96px">
+
+    <!-- VEÍCULOS -->
+    <sc-if value="{{ isVeiculos }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:riseIn .35s ease both">
+        <div style="display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom:22px">
+          <div style="margin-right:auto">
+            <h1 style="margin:0; font-size:30px; font-weight:600; letter-spacing:-.035em">Meus veículos</h1>
+            <p style="margin:6px 0 0; color:var(--muted,#71757C); font-size:14px">Toque em um veículo para ver a média e registrar abastecimentos.</p>
+          </div>
+          <button onClick="{{ goCadastro }}" style="height:42px; padding:0 20px; border-radius:12px; border:none; background:var(--accent,#0E8F6E); color:var(--accentFg,#fff); font-size:14px; font-weight:600; cursor:pointer" style-hover="filter:brightness(1.08)">+ Novo veículo</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px">
+          <sc-for list="{{ vehicleCards }}" as="v" hint-placeholder-count="2">
+            <div onClick="{{ v.open }}" style="position:relative; background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:22px; cursor:pointer; overflow:hidden; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease" style-hover="transform:translateY(-3px); box-shadow:0 14px 34px rgba(0,0,0,.09); border-color:var(--accent,#0E8F6E)">
+              <div style="position:absolute; right:-30px; top:-30px; width:120px; height:120px; border-radius:50%; background:{{ v.cor }}; opacity:.16; filter:blur(2px)"></div>
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px">
+                <span style="width:26px; height:26px; border-radius:8px; background:{{ v.cor }}; border:1px solid rgba(0,0,0,.12)"></span>
+                <span style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted,#71757C)">{{ v.tipo }}</span>
+              </div>
+              <div style="font-size:21px; font-weight:600; letter-spacing:-.03em; line-height:1.2">{{ v.titulo }}</div>
+              <div style="margin-top:4px; font-size:13px; color:var(--muted,#71757C)">{{ v.sub }}</div>
+              <div style="margin-top:16px; display:inline-flex; align-items:center; padding:5px 10px; border-radius:7px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:500; letter-spacing:.08em">{{ v.placa }}</div>
+              <div style="margin-top:22px; padding-top:18px; border-top:1px dashed var(--line,#E5E5E0); display:flex; align-items:flex-end; gap:20px">
+                <div>
+                  <div style="font-size:11px; color:var(--muted,#71757C); margin-bottom:2px">Média</div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; letter-spacing:-.04em; color:var(--accent,#0E8F6E)">{{ v.media }}</div>
+                </div>
+                <div style="margin-left:auto; text-align:right">
+                  <div style="font-size:11px; color:var(--muted,#71757C); margin-bottom:2px">Odômetro</div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:500">{{ v.km }}</div>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+
+          <div onClick="{{ goCadastro }}" style="min-height:220px; border:1.5px dashed var(--line,#E5E5E0); border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; color:var(--muted,#71757C); transition:all .2s ease" style-hover="border-color:var(--accent,#0E8F6E); color:var(--accent,#0E8F6E)">
+            <div style="width:44px; height:44px; border-radius:14px; border:1.5px solid currentColor; display:grid; place-items:center; font-size:22px; font-weight:400">+</div>
+            <div style="font-size:14px; font-weight:500">Cadastrar veículo</div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- CADASTRO -->
+    <sc-if value="{{ isCadastro }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:riseIn .35s ease both; max-width:760px; margin:0 auto">
+        <h1 style="margin:0; font-size:30px; font-weight:600; letter-spacing:-.035em">Novo veículo</h1>
+        <p style="margin:6px 0 24px; color:var(--muted,#71757C); font-size:14px">Só o essencial. Você pode completar depois.</p>
+
+        <div style="display:grid; gap:16px">
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:22px">
+            <div style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted,#71757C); margin-bottom:14px">Tipo</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap">
+              <sc-for list="{{ tipoOpts }}" as="t" hint-placeholder-count="2">
+                <button onClick="{{ t.pick }}" style="flex:1 1 120px; padding:16px; border-radius:14px; border:1.5px solid {{ t.bd }}; background:{{ t.bg }}; color:var(--fg,#14161A); cursor:pointer; text-align:left; transition:all .18s ease">
+                  <div style="font-size:22px; line-height:1">{{ t.icon }}</div>
+                  <div style="margin-top:8px; font-size:14px; font-weight:600">{{ t.label }}</div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:22px">
+            <div style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted,#71757C); margin-bottom:14px">Identificação</div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:14px">
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Marca</span>
+                <input name="marca" value="{{ veh.marca }}" onChange="{{ onVeh }}" placeholder="Honda" style="height:44px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Modelo</span>
+                <input name="modelo" value="{{ veh.modelo }}" onChange="{{ onVeh }}" placeholder="Civic EXL" style="height:44px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Ano</span>
+                <input name="ano" value="{{ veh.ano }}" onChange="{{ onVeh }}" placeholder="2019" inputmode="numeric" style="height:44px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Placa</span>
+                <input name="placa" value="{{ veh.placa }}" onChange="{{ onVeh }}" placeholder="ABC1D23" style="height:44px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-transform:uppercase; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+              </label>
+            </div>
+          </div>
+
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:22px">
+            <div style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted,#71757C); margin-bottom:14px">Cor</div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center">
+              <sc-for list="{{ corOpts }}" as="k" hint-placeholder-count="7">
+                <button onClick="{{ k.pick }}" title="{{ k.nome }}" style="width:40px; height:40px; border-radius:12px; background:{{ k.hex }}; border:2px solid {{ k.bd }}; box-shadow:inset 0 0 0 2px var(--panel,#fff); cursor:pointer; transition:transform .15s ease" style-hover="transform:scale(1.08)"></button>
+              </sc-for>
+              <span style="font-size:13px; color:var(--muted,#71757C); margin-left:4px">{{ veh.corNome }}</span>
+            </div>
+          </div>
+
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:22px">
+            <div style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted,#71757C); margin-bottom:14px">Combustível principal</div>
+            <div style="display:flex; gap:9px; flex-wrap:wrap">
+              <sc-for list="{{ fuelOpts }}" as="f" hint-placeholder-count="6">
+                <button onClick="{{ f.pick }}" style="padding:10px 15px; border-radius:11px; border:1.5px solid {{ f.bd }}; background:{{ f.bg }}; color:var(--fg,#14161A); font-size:13px; font-weight:500; cursor:pointer; transition:all .18s ease">{{ f.label }}</button>
+              </sc-for>
+            </div>
+            <div style="margin-top:20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:14px">
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Quilometragem atual (km)</span>
+                <input name="km" value="{{ veh.km }}" onChange="{{ onVeh }}" placeholder="48210" inputmode="decimal" style="height:44px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; font-family:'JetBrains Mono',monospace; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Apelido (opcional)</span>
+                <input name="apelido" value="{{ veh.apelido }}" onChange="{{ onVeh }}" placeholder="Carro do trabalho" style="height:44px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+              </label>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:12px; justify-content:flex-end; padding-top:4px">
+            <button onClick="{{ goVeiculos }}" style="height:46px; padding:0 20px; border-radius:12px; border:1px solid var(--line,#E5E5E0); background:transparent; color:var(--fg,#14161A); font-size:14px; font-weight:500; cursor:pointer">Cancelar</button>
+            <button onClick="{{ saveVehicle }}" style="height:46px; padding:0 26px; border-radius:12px; border:none; background:var(--accent,#0E8F6E); color:var(--accentFg,#fff); font-size:14px; font-weight:600; cursor:pointer" style-hover="filter:brightness(1.08)">Salvar veículo</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- DASHBOARD -->
+    <sc-if value="{{ isPainel }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:riseIn .35s ease both">
+        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:22px">
+          <div style="display:flex; align-items:center; gap:12px; margin-right:auto">
+            <span style="width:34px; height:34px; border-radius:11px; background:{{ sel.cor }}; border:1px solid rgba(0,0,0,.12)"></span>
+            <div>
+              <h1 style="margin:0; font-size:26px; font-weight:600; letter-spacing:-.035em">{{ sel.titulo }}</h1>
+              <div style="font-size:13px; color:var(--muted,#71757C)">{{ sel.placa }} · {{ sel.combustivel }}</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap">
+            <sc-for list="{{ vehiclePills }}" as="p" hint-placeholder-count="2">
+              <button onClick="{{ p.pick }}" style="height:36px; padding:0 14px; border-radius:99px; border:1px solid {{ p.bd }}; background:{{ p.bg }}; color:{{ p.fg }}; font-size:13px; font-weight:500; cursor:pointer">{{ p.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:16px; margin-bottom:16px">
+          <div style="background:var(--accent,#0E8F6E); color:var(--accentFg,#fff); border-radius:20px; padding:24px; position:relative; overflow:hidden">
+            <div style="font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; opacity:.8">Média de consumo</div>
+            <div style="display:flex; align-items:baseline; gap:8px; margin-top:10px">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:48px; font-weight:700; letter-spacing:-.05em; line-height:1">{{ stats.media }}</span>
+              <span style="font-size:15px; opacity:.85">{{ stats.unidade }}</span>
+            </div>
+            <div style="margin-top:12px; font-size:13px; opacity:.85">{{ stats.tendencia }}</div>
+          </div>
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:24px">
+            <div style="font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted,#71757C)">Custo por km</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:36px; font-weight:700; letter-spacing:-.04em; margin-top:10px">{{ stats.custoKm }}</div>
+            <div style="margin-top:8px; font-size:13px; color:var(--muted,#71757C)">Último preço: {{ stats.ultimoPreco }}/L</div>
+          </div>
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:24px">
+            <div style="font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted,#71757C)">Total gasto</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:36px; font-weight:700; letter-spacing:-.04em; margin-top:10px">{{ stats.totalGasto }}</div>
+            <div style="margin-top:8px; font-size:13px; color:var(--muted,#71757C)">{{ stats.resumoLitros }}</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px,1fr)); gap:16px">
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:24px">
+            <div style="display:flex; align-items:center; margin-bottom:20px">
+              <div style="font-size:15px; font-weight:600; letter-spacing:-.02em; margin-right:auto">Consumo por abastecimento</div>
+              <div style="font-size:12px; color:var(--muted,#71757C)">{{ stats.unidade }}</div>
+            </div>
+            <div style="display:flex; align-items:flex-end; gap:10px; height:150px">
+              <sc-for list="{{ chart }}" as="b" hint-placeholder-count="6">
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:8px; height:100%">
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:var(--muted,#71757C)">{{ b.val }}</div>
+                  <div style="width:100%; height:{{ b.h }}; background:{{ b.color }}; border-radius:7px 7px 3px 3px; min-height:6px; transition:height .4s ease"></div>
+                  <div style="font-size:10px; color:var(--muted,#71757C)">{{ b.label }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ chartEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center; color:var(--muted,#71757C); font-size:13px; padding:20px 0">Registre pelo menos 2 abastecimentos para ver a média.</div>
+            </sc-if>
+          </div>
+
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:24px">
+            <div style="display:flex; align-items:center; margin-bottom:16px">
+              <div style="font-size:15px; font-weight:600; letter-spacing:-.02em; margin-right:auto">Últimos abastecimentos</div>
+              <button onClick="{{ goHistorico }}" style="background:none; border:none; color:var(--accent,#0E8F6E); font-size:13px; font-weight:600; cursor:pointer; padding:0">Ver tudo</button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:2px">
+              <sc-for list="{{ recentFills }}" as="f" hint-placeholder-count="4">
+                <div style="display:flex; align-items:center; gap:14px; padding:13px 0; border-bottom:1px solid var(--line,#E5E5E0)">
+                  <div style="width:38px; height:38px; border-radius:11px; background:var(--soft,#EAF6F1); display:grid; place-items:center; font-size:16px">⛽</div>
+                  <div style="min-width:0; margin-right:auto">
+                    <div style="font-size:14px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ f.posto }}</div>
+                    <div style="font-size:12px; color:var(--muted,#71757C)">{{ f.data }} · {{ f.litros }} L · {{ f.km }} km</div>
+                  </div>
+                  <div style="text-align:right">
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600">{{ f.total }}</div>
+                    <div style="font-size:11px; color:var(--muted,#71757C)">{{ f.preco }}/L</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <button onClick="{{ goAbastecer }}" style="width:100%; margin-top:18px; height:46px; border-radius:13px; border:none; background:var(--accent,#0E8F6E); color:var(--accentFg,#fff); font-size:14px; font-weight:600; cursor:pointer" style-hover="filter:brightness(1.08)">Registrar abastecimento</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ABASTECER -->
+    <sc-if value="{{ isAbastecer }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:riseIn .35s ease both; max-width:760px; margin:0 auto">
+        <h1 style="margin:0; font-size:30px; font-weight:600; letter-spacing:-.035em">Abastecimento</h1>
+        <p style="margin:6px 0 24px; color:var(--muted,#71757C); font-size:14px">Anote o km do painel na hora de abastecer — é isso que dá a média.</p>
+
+        <div style="display:grid; gap:16px">
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:22px">
+            <div style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted,#71757C); margin-bottom:14px">Veículo</div>
+            <div style="display:flex; gap:9px; flex-wrap:wrap">
+              <sc-for list="{{ vehiclePills }}" as="p" hint-placeholder-count="2">
+                <button onClick="{{ p.pick }}" style="padding:11px 16px; border-radius:12px; border:1.5px solid {{ p.bd }}; background:{{ p.bg }}; color:{{ p.fg }}; font-size:13px; font-weight:500; cursor:pointer">{{ p.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:22px">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:14px">
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Quilometragem no painel</span>
+                <input name="km" value="{{ fill.km }}" onChange="{{ onFill }}" placeholder="{{ fill.kmHint }}" inputmode="decimal" style="height:48px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:16px; font-family:'JetBrains Mono',monospace; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Litros abastecidos</span>
+                <input name="litros" value="{{ fill.litros }}" onChange="{{ onFill }}" placeholder="32,4" inputmode="decimal" style="height:48px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:16px; font-family:'JetBrains Mono',monospace; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Valor total pago (R$)</span>
+                <input name="total" value="{{ fill.total }}" onChange="{{ onFill }}" placeholder="198,50" inputmode="decimal" style="height:48px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:16px; font-family:'JetBrains Mono',monospace; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Data</span>
+                <input name="data" value="{{ fill.data }}" onChange="{{ onFill }}" type="date" style="height:48px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:15px; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+              </label>
+            </div>
+
+            <div style="margin-top:16px; padding:16px 18px; border-radius:14px; background:var(--soft,#EAF6F1); display:flex; align-items:center; gap:14px; flex-wrap:wrap">
+              <div style="margin-right:auto">
+                <div style="font-size:12px; color:var(--muted,#71757C)">Preço por litro (calculado)</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:28px; font-weight:700; letter-spacing:-.04em; color:var(--accent,#0E8F6E); margin-top:2px">{{ fill.precoCalc }}</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:12px; color:var(--muted,#71757C)">Rodou desde o último</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:600; margin-top:2px">{{ fill.rodou }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:22px">
+            <div style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted,#71757C); margin-bottom:14px">Combustível e posto</div>
+            <div style="display:flex; gap:9px; flex-wrap:wrap; margin-bottom:16px">
+              <sc-for list="{{ fillFuelOpts }}" as="f" hint-placeholder-count="6">
+                <button onClick="{{ f.pick }}" style="padding:10px 15px; border-radius:11px; border:1.5px solid {{ f.bd }}; background:{{ f.bg }}; color:var(--fg,#14161A); font-size:13px; font-weight:500; cursor:pointer">{{ f.label }}</button>
+              </sc-for>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:14px">
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Posto</span>
+                <input name="posto" value="{{ fill.posto }}" onChange="{{ onFill }}" list="postos-list" placeholder="Shell Av. Brasil" style="height:44px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:12px; color:var(--muted,#71757C)">Tanque cheio?</span>
+                <button onClick="{{ toggleCheio }}" style="height:44px; border-radius:11px; border:1.5px solid {{ fill.cheioBd }}; background:{{ fill.cheioBg }}; color:var(--fg,#14161A); font-size:14px; font-weight:500; cursor:pointer; text-align:left; padding:0 14px">{{ fill.cheioLabel }}</button>
+              </label>
+            </div>
+            <div style="margin-top:10px; font-size:12px; color:var(--muted,#71757C)">Tanque cheio deixa a média mais precisa. Abastecimentos parciais entram no gasto, mas não no cálculo.</div>
+          </div>
+
+          <div style="display:flex; gap:12px; justify-content:flex-end">
+            <button onClick="{{ goPainel }}" style="height:46px; padding:0 20px; border-radius:12px; border:1px solid var(--line,#E5E5E0); background:transparent; color:var(--fg,#14161A); font-size:14px; font-weight:500; cursor:pointer">Cancelar</button>
+            <button onClick="{{ saveFill }}" style="height:46px; padding:0 26px; border-radius:12px; border:none; background:var(--accent,#0E8F6E); color:var(--accentFg,#fff); font-size:14px; font-weight:600; cursor:pointer" style-hover="filter:brightness(1.08)">Salvar abastecimento</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- HISTÓRICO -->
+    <sc-if value="{{ isHistorico }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:riseIn .35s ease both">
+        <div style="display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom:22px">
+          <div style="margin-right:auto">
+            <h1 style="margin:0; font-size:30px; font-weight:600; letter-spacing:-.035em">Histórico</h1>
+            <p style="margin:6px 0 0; color:var(--muted,#71757C); font-size:14px">{{ sel.titulo }} · {{ stats.qtdAbastecimentos }}</p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap">
+            <sc-for list="{{ vehiclePills }}" as="p" hint-placeholder-count="2">
+              <button onClick="{{ p.pick }}" style="height:36px; padding:0 14px; border-radius:99px; border:1px solid {{ p.bd }}; background:{{ p.bg }}; color:{{ p.fg }}; font-size:13px; font-weight:500; cursor:pointer">{{ p.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; overflow:hidden">
+          <sc-for list="{{ historyRows }}" as="h" hint-placeholder-count="5">
+            <div style="display:flex; align-items:center; gap:16px; padding:18px 22px; border-bottom:1px solid var(--line,#E5E5E0); flex-wrap:wrap">
+              <div style="width:52px">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; letter-spacing:-.03em">{{ h.dia }}</div>
+                <div style="font-size:11px; color:var(--muted,#71757C); text-transform:uppercase; letter-spacing:.06em">{{ h.mes }}</div>
+              </div>
+              <div style="min-width:160px; margin-right:auto">
+                <div style="font-size:15px; font-weight:500">{{ h.posto }}</div>
+                <div style="font-size:12px; color:var(--muted,#71757C)">{{ h.combustivel }} · {{ h.km }} km {{ h.tag }}</div>
+              </div>
+              <div style="min-width:78px">
+                <div style="font-size:11px; color:var(--muted,#71757C)">Litros</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:600">{{ h.litros }}</div>
+              </div>
+              <div style="min-width:88px">
+                <div style="font-size:11px; color:var(--muted,#71757C)">R$/L</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:600">{{ h.preco }}</div>
+              </div>
+              <div style="min-width:92px">
+                <div style="font-size:11px; color:var(--muted,#71757C)">Consumo</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:600; color:{{ h.consumoCor }}">{{ h.consumo }}</div>
+              </div>
+              <div style="min-width:96px; text-align:right">
+                <div style="font-size:11px; color:var(--muted,#71757C)">Total</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700">{{ h.total }}</div>
+              </div>
+              <button onClick="{{ h.remove }}" title="Excluir" style="width:32px; height:32px; border-radius:9px; border:1px solid var(--line,#E5E5E0); background:transparent; color:var(--muted,#71757C); cursor:pointer; font-size:14px" style-hover="color:#D14343; border-color:#D14343">×</button>
+            </div>
+          </sc-for>
+          <sc-if value="{{ historyEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:44px; text-align:center; color:var(--muted,#71757C); font-size:14px">Nenhum abastecimento registrado ainda.</div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- POSTOS -->
+    <sc-if value="{{ isPostos }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:riseIn .35s ease both">
+        <div style="margin-bottom:22px">
+          <h1 style="margin:0; font-size:30px; font-weight:600; letter-spacing:-.035em">Postos e preços</h1>
+          <p style="margin:6px 0 0; color:var(--muted,#71757C); font-size:14px">Passou por um posto e viu o preço? Anote aqui pra não esquecer.</p>
+        </div>
+
+        <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:22px; margin-bottom:16px">
+          <div style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted,#71757C); margin-bottom:14px">Anotar preço</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:14px; align-items:end">
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-size:12px; color:var(--muted,#71757C)">Posto</span>
+              <input name="nome" value="{{ station.nome }}" onChange="{{ onStation }}" placeholder="Ipiranga Centro" style="height:44px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-size:12px; color:var(--muted,#71757C)">Gasolina</span>
+              <input name="gasolina" value="{{ station.gasolina }}" onChange="{{ onStation }}" placeholder="6,29" inputmode="decimal" style="height:44px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; font-family:'JetBrains Mono',monospace; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-size:12px; color:var(--muted,#71757C)">Etanol</span>
+              <input name="etanol" value="{{ station.etanol }}" onChange="{{ onStation }}" placeholder="4,19" inputmode="decimal" style="height:44px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; font-family:'JetBrains Mono',monospace; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-size:12px; color:var(--muted,#71757C)">Diesel</span>
+              <input name="diesel" value="{{ station.diesel }}" onChange="{{ onStation }}" placeholder="5,89" inputmode="decimal" style="height:44px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; font-family:'JetBrains Mono',monospace; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+            </label>
+            <button onClick="{{ saveStation }}" style="height:44px; padding:0 20px; border-radius:11px; border:none; background:var(--accent,#0E8F6E); color:var(--accentFg,#fff); font-size:14px; font-weight:600; cursor:pointer">Salvar</button>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:16px">
+          <sc-for list="{{ stationCards }}" as="s" hint-placeholder-count="3">
+            <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:22px">
+              <div style="display:flex; align-items:flex-start; gap:10px">
+                <div style="margin-right:auto">
+                  <div style="font-size:17px; font-weight:600; letter-spacing:-.02em">{{ s.nome }}</div>
+                  <div style="font-size:12px; color:var(--muted,#71757C); margin-top:3px">Atualizado {{ s.quando }}</div>
+                </div>
+                <sc-if value="{{ s.maisBarato }}" hint-placeholder-val="{{ false }}">
+                  <span style="padding:4px 9px; border-radius:7px; background:var(--soft,#EAF6F1); color:var(--accent,#0E8F6E); font-size:11px; font-weight:600">mais barato</span>
+                </sc-if>
+              </div>
+              <div style="margin-top:18px; display:flex; flex-direction:column; gap:2px">
+                <sc-for list="{{ s.precos }}" as="p" hint-placeholder-count="3">
+                  <div style="display:flex; align-items:center; padding:9px 0; border-top:1px solid var(--line,#E5E5E0)">
+                    <span style="font-size:13px; color:var(--muted,#71757C); margin-right:auto">{{ p.nome }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:600">{{ p.valor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <button onClick="{{ s.edit }}" style="width:100%; margin-top:16px; height:38px; border-radius:10px; border:1px solid var(--line,#E5E5E0); background:transparent; color:var(--fg,#14161A); font-size:13px; font-weight:500; cursor:pointer" style-hover="border-color:var(--accent,#0E8F6E); color:var(--accent,#0E8F6E)">Atualizar preços</button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- COMPARATIVO -->
+    <sc-if value="{{ isComparativo }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:riseIn .35s ease both; max-width:820px; margin:0 auto">
+        <h1 style="margin:0; font-size:30px; font-weight:600; letter-spacing:-.035em">Etanol ou gasolina?</h1>
+        <p style="margin:6px 0 24px; color:var(--muted,#71757C); font-size:14px">Compara pelo consumo real do seu veículo — não só pela regra dos 70%.</p>
+
+        <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:20px; padding:24px">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px">
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-size:12px; color:var(--muted,#71757C)">Preço gasolina (R$/L)</span>
+              <input name="g" value="{{ comp.g }}" onChange="{{ onComp }}" inputmode="decimal" style="height:48px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:17px; font-family:'JetBrains Mono',monospace; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-size:12px; color:var(--muted,#71757C)">Preço etanol (R$/L)</span>
+              <input name="e" value="{{ comp.e }}" onChange="{{ onComp }}" inputmode="decimal" style="height:48px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:17px; font-family:'JetBrains Mono',monospace; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-size:12px; color:var(--muted,#71757C)">Rendimento etanol/gasolina</span>
+              <input name="r" value="{{ comp.r }}" onChange="{{ onComp }}" inputmode="decimal" style="height:48px; padding:0 14px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:17px; font-family:'JetBrains Mono',monospace; outline:none" style-focus="border-color:var(--accent,#0E8F6E)">
+            </label>
+          </div>
+
+          <div style="margin-top:22px; padding:26px; border-radius:16px; background:{{ comp.cor }}; color:#fff">
+            <div style="font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; opacity:.85">Vale mais a pena</div>
+            <div style="font-size:38px; font-weight:700; letter-spacing:-.04em; margin-top:6px">{{ comp.vencedor }}</div>
+            <div style="font-size:14px; opacity:.9; margin-top:8px">{{ comp.explicacao }}</div>
+          </div>
+
+          <div style="margin-top:18px; display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:14px">
+            <div style="padding:18px; border-radius:14px; border:1px solid var(--line,#E5E5E0)">
+              <div style="font-size:12px; color:var(--muted,#71757C)">Proporção etanol/gasolina</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; margin-top:4px">{{ comp.proporcao }}</div>
+            </div>
+            <div style="padding:18px; border-radius:14px; border:1px solid var(--line,#E5E5E0)">
+              <div style="font-size:12px; color:var(--muted,#71757C)">Custo por km com gasolina</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; margin-top:4px">{{ comp.custoG }}</div>
+            </div>
+            <div style="padding:18px; border-radius:14px; border:1px solid var(--line,#E5E5E0)">
+              <div style="font-size:12px; color:var(--muted,#71757C)">Custo por km com etanol</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; margin-top:4px">{{ comp.custoE }}</div>
+            </div>
+          </div>
+          <div style="margin-top:14px; font-size:12px; color:var(--muted,#71757C)">Baseado na média atual de {{ sel.titulo }}: {{ stats.media }} {{ stats.unidade }}.</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- CONFIG -->
+    <sc-if value="{{ isConfig }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:riseIn .35s ease both; max-width:640px; margin:0 auto">
+        <h1 style="margin:0; font-size:30px; font-weight:600; letter-spacing:-.035em">Configurações</h1>
+        <p style="margin:6px 0 24px; color:var(--muted,#71757C); font-size:14px">Preferências do app.</p>
+        <div style="display:grid; gap:14px">
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:18px; padding:20px; display:flex; align-items:center; gap:16px">
+            <div style="margin-right:auto">
+              <div style="font-size:15px; font-weight:600">Tema</div>
+              <div style="font-size:13px; color:var(--muted,#71757C); margin-top:2px">Claro ou escuro</div>
+            </div>
+            <button onClick="{{ toggleTheme }}" style="height:40px; padding:0 18px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; font-weight:500; cursor:pointer">{{ themeLabel }}</button>
+          </div>
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:18px; padding:20px; display:flex; align-items:center; gap:16px">
+            <div style="margin-right:auto">
+              <div style="font-size:15px; font-weight:600">Unidade de consumo</div>
+              <div style="font-size:13px; color:var(--muted,#71757C); margin-top:2px">Como a média é exibida</div>
+            </div>
+            <button onClick="{{ toggleUnit }}" style="height:40px; padding:0 18px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:var(--panel2,#FAFAF8); color:var(--fg,#14161A); font-size:14px; font-weight:500; font-family:'JetBrains Mono',monospace; cursor:pointer">{{ stats.unidade }}</button>
+          </div>
+          <div style="background:var(--panel,#fff); border:1px solid var(--line,#E5E5E0); border-radius:18px; padding:20px; display:flex; align-items:center; gap:16px">
+            <div style="margin-right:auto">
+              <div style="font-size:15px; font-weight:600">Dados de exemplo</div>
+              <div style="font-size:13px; color:var(--muted,#71757C); margin-top:2px">Restaura os veículos e abastecimentos de demonstração</div>
+            </div>
+            <button onClick="{{ resetData }}" style="height:40px; padding:0 18px; border-radius:11px; border:1px solid var(--line,#E5E5E0); background:transparent; color:var(--fg,#14161A); font-size:14px; font-weight:500; cursor:pointer" style-hover="border-color:#D14343; color:#D14343">Restaurar</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </main>
+
+  <datalist id="postos-list">
+    <sc-for list="{{ stationNames }}" as="s" hint-placeholder-count="3">
+      <option value="{{ s.nome }}"></option>
+    </sc-for>
+  </datalist>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:50; padding:13px 22px; border-radius:13px; background:var(--fg,#14161A); color:var(--bg,#F3F3F1); font-size:14px; font-weight:500; box-shadow:0 12px 30px rgba(0,0,0,.22); animation:toastIn .25s ease both">{{ toast }}</div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;temaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Claro&quot;,&quot;Escuro&quot;],&quot;default&quot;:&quot;Claro&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;corDestaque&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;options&quot;:[&quot;#0E8F6E&quot;,&quot;#1F5FA8&quot;,&quot;#D97706&quot;,&quot;#7C3AED&quot;],&quot;default&quot;:&quot;#0E8F6E&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;unidade&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;km/L&quot;,&quot;L/100km&quot;],&quot;default&quot;:&quot;km/L&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const FUELS = ["Gasolina comum","Gasolina aditivada","Etanol","Diesel","GNV","Elétrico"];
+const CORES = [
+  {hex:"#B8BDC4", nome:"Prata"}, {hex:"#1A1D21", nome:"Preto"}, {hex:"#F2F2EE", nome:"Branco"},
+  {hex:"#C0392B", nome:"Vermelho"}, {hex:"#1F5FA8", nome:"Azul"}, {hex:"#2E7D5B", nome:"Verde"},
+  {hex:"#D98A2B", nome:"Laranja"}
+];
+const NAV = [
+  {k:"veiculos", label:"Veículos"}, {k:"painel", label:"Painel"}, {k:"abastecer", label:"Abastecer"},
+  {k:"historico", label:"Histórico"}, {k:"postos", label:"Postos"}, {k:"comparativo", label:"Etanol × Gasolina"},
+  {k:"config", label:"Ajustes"}
+];
+const THEMES = {
+  light: {bg:"#F3F3F1", panel:"#FFFFFF", panel2:"#FAFAF8", line:"#E5E5E0", fg:"#14161A", muted:"#71757C", accentFg:"#FFFFFF", soft:"#EAF6F1"},
+  dark:  {bg:"#0C0E10", panel:"#15181B", panel2:"#1B1F23", line:"#262B30", fg:"#ECEFF2", muted:"#8B939B", accentFg:"#06110C", soft:"#12251E"}
+};
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem("litro.v1") || "null"); } catch (e) {}
+    const data = saved || this.seed();
+    this.state = {
+      theme: props.temaInicial === "Escuro" ? "dark" : "light",
+      unit: props.unidade === "L/100km" ? "l100" : "kml",
+      screen: "veiculos",
+      vehicles: data.vehicles,
+      fills: data.fills,
+      stations: data.stations,
+      selectedId: data.selectedId || data.vehicles[0].id,
+      veh: this.emptyVeh(),
+      fill: this.emptyFill(),
+      station: {nome:"", gasolina:"", etanol:"", diesel:""},
+      comp: {g:"6,29", e:"4,19", r:"0,70"},
+      toast: ""
+    };
+  }
+
+  seed() {
+    const v1 = {id:"v1", tipo:"Carro", marca:"Honda", modelo:"Civic EXL", ano:"2019", placa:"RTG4B21", cor:"#B8BDC4", corNome:"Prata", combustivel:"Gasolina comum", apelido:"", km:48210};
+    const v2 = {id:"v2", tipo:"Moto", marca:"Honda", modelo:"CG 160 Fan", ano:"2022", placa:"QNX7J09", cor:"#C0392B", corNome:"Vermelho", combustivel:"Gasolina comum", apelido:"", km:12440};
+    const f = (id,vid,d,km,l,t,posto,fuel) => ({id, vehicleId:vid, data:d, km, litros:l, total:t, posto, combustivel:fuel, cheio:true});
+    return {
+      vehicles: [v1, v2],
+      fills: [
+        f("f1","v1","2026-06-02",47010,38.2,241.35,"Shell Av. Brasil","Gasolina comum"),
+        f("f2","v1","2026-06-19",47398,32.4,203.47,"Ipiranga Centro","Gasolina comum"),
+        f("f3","v1","2026-07-05",47810,35.1,222.38,"Shell Av. Brasil","Gasolina comum"),
+        f("f4","v1","2026-07-24",48210,33.9,213.57,"Petrobras Rod. 040","Gasolina comum"),
+        f("f5","v2","2026-06-28",12080,11.2,70.34,"Ipiranga Centro","Gasolina comum"),
+        f("f6","v2","2026-07-21",12440,10.4,65.30,"Shell Av. Brasil","Gasolina comum")
+      ],
+      stations: [
+        {id:"p1", nome:"Shell Av. Brasil", gasolina:6.29, etanol:4.19, diesel:5.89, quando:"há 3 dias"},
+        {id:"p2", nome:"Ipiranga Centro", gasolina:6.09, etanol:4.35, diesel:5.79, quando:"há 1 semana"},
+        {id:"p3", nome:"Petrobras Rod. 040", gasolina:6.19, etanol:4.09, diesel:5.99, quando:"ontem"}
+      ],
+      selectedId: "v1"
+    };
+  }
+
+  emptyVeh() { return {tipo:"Carro", marca:"", modelo:"", ano:"", placa:"", cor:"#B8BDC4", corNome:"Prata", combustivel:"Gasolina comum", apelido:"", km:""}; }
+  emptyFill() {
+    const d = new Date();
+    const iso = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+    return {data: iso, km:"", litros:"", total:"", posto:"", combustivel:"Gasolina comum", cheio:true};
+  }
+
+  componentDidUpdate() { this.persist(); }
+  persist() {
+    const s = this.state;
+    try { localStorage.setItem("litro.v1", JSON.stringify({vehicles:s.vehicles, fills:s.fills, stations:s.stations, selectedId:s.selectedId})); } catch (e) {}
+  }
+
+  num(v) { if (typeof v === "number") return v; const n = parseFloat(String(v||"").replace(/\./g,"").replace(",",".")); return isNaN(n) ? 0 : n; }
+  numDot(v) { if (typeof v === "number") return v; const n = parseFloat(String(v||"").replace(",",".")); return isNaN(n) ? 0 : n; }
+  money(n) { return "R$ " + (n||0).toLocaleString("pt-BR",{minimumFractionDigits:2, maximumFractionDigits:2}); }
+  dec(n, d) { return (n||0).toLocaleString("pt-BR",{minimumFractionDigits:d, maximumFractionDigits:d}); }
+  toast(msg) { this.setState({toast:msg}); clearTimeout(this._t); this._t = setTimeout(() => this.setState({toast:""}), 2600); }
+  accent() { return this.props.corDestaque || "#0E8F6E"; }
+
+  vehicleFills(id) { return this.state.fills.filter(f => f.vehicleId === id).sort((a,b) => a.km - b.km); }
+
+  consumos(id) {
+    const fs = this.vehicleFills(id); const out = [];
+    for (let i = 1; i < fs.length; i++) {
+      const km = fs[i].km - fs[i-1].km;
+      if (fs[i].cheio && km > 0 && fs[i].litros > 0) out.push({fill: fs[i], km, kml: km / fs[i].litros});
+    }
+    return out;
+  }
+
+  mediaKml(id) {
+    const cs = this.consumos(id);
+    if (!cs.length) return 0;
+    const km = cs.reduce((a,c) => a + c.km, 0), l = cs.reduce((a,c) => a + c.fill.litros, 0);
+    return l ? km / l : 0;
+  }
+
+  showConsumo(kml) {
+    if (!kml) return "—";
+    return this.state.unit === "l100" ? this.dec(100 / kml, 1) : this.dec(kml, 1);
+  }
+
+  vehicleTitle(v) { return v.apelido || ((v.marca ? v.marca + " " : "") + v.modelo) || "Veículo"; }
+  fmtPlaca(p) { const s = (p||"").toUpperCase().replace(/[^A-Z0-9]/g,""); return s.length === 7 ? s.slice(0,3) + "-" + s.slice(3) : s; }
+  odo(v) { const fs = this.vehicleFills(v.id); return fs.length ? Math.max(v.km||0, fs[fs.length-1].km) : (v.km||0); }
+
+  go(screen) { return () => this.setState({screen}); }
+
+  renderVals() {
+    const s = this.state, self = this;
+    const accent = this.accent();
+    const c = Object.assign({accent}, THEMES[s.theme]);
+    const sel = s.vehicles.find(v => v.id === s.selectedId) || s.vehicles[0] || {};
+    const selFills = sel.id ? this.vehicleFills(sel.id) : [];
+    const cs = sel.id ? this.consumos(sel.id) : [];
+    const media = sel.id ? this.mediaKml(sel.id) : 0;
+    const unidade = s.unit === "l100" ? "L/100km" : "km/L";
+
+    const pick = (arr, active, onPick) => arr.map(o => {
+      const on = o.value === active;
+      return {label:o.label, icon:o.icon, bd: on ? accent : c.line, bg: on ? c.soft : "transparent",
+        fg: on ? accent : c.fg, pick: () => onPick(o.value)};
+    });
+
+    const totalGasto = selFills.reduce((a,f) => a + (f.total||0), 0);
+    const totalLitros = selFills.reduce((a,f) => a + (f.litros||0), 0);
+    const last = selFills[selFills.length - 1];
+    const lastPreco = last && last.litros ? last.total / last.litros : 0;
+    const custoKm = media ? lastPreco / media : 0;
+    const prev = cs.length > 1 ? cs[cs.length - 2].kml : 0;
+    const cur = cs.length ? cs[cs.length - 1].kml : 0;
+    const diff = prev && cur ? ((cur - prev) / prev) * 100 : 0;
+
+    const chartData = cs.slice(-6);
+    const maxK = Math.max.apply(null, chartData.map(x => x.kml).concat([1]));
+
+    // form: abastecer
+    const fLitros = this.numDot(s.fill.litros), fTotal = this.numDot(s.fill.total), fKm = this.numDot(s.fill.km);
+    const lastKmVeh = selFills.length ? selFills[selFills.length-1].km : (sel.km || 0);
+
+    // comparativo
+    const pg = this.numDot(s.comp.g), pe = this.numDot(s.comp.e), ratio = this.numDot(s.comp.r) || 0.7;
+    const prop = pg ? pe / pg : 0;
+    const etanolVence = prop > 0 && prop < ratio;
+    const mediaG = media || 12;
+    const mediaE = mediaG * ratio;
+
+    const monthNames = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+    const consumoOf = f => { const c2 = cs.find(x => x.fill.id === f.id); return c2 ? c2.kml : 0; };
+
+    const cheapest = s.stations.reduce((a,b) => (b.gasolina && (!a || b.gasolina < a.gasolina)) ? b : a, null);
+
+    return {
+      c, sel: {titulo: this.vehicleTitle(sel), placa: this.fmtPlaca(sel.placa), cor: sel.cor || accent, combustivel: sel.combustivel || "—"},
+      themeLabel: s.theme === "dark" ? "Escuro" : "Claro",
+      themeIcon: s.theme === "dark" ? "◐" : "◑",
+      toggleTheme: () => this.setState({theme: s.theme === "dark" ? "light" : "dark"}),
+      toggleUnit: () => this.setState({unit: s.unit === "kml" ? "l100" : "kml"}),
+      resetData: () => { const d = this.seed(); this.setState({vehicles:d.vehicles, fills:d.fills, stations:d.stations, selectedId:d.selectedId}); this.toast("Dados de exemplo restaurados"); },
+
+      nav: NAV.map(n => ({label:n.label, go: this.go(n.k),
+        bd: s.screen === n.k ? accent : c.line, bg: s.screen === n.k ? accent : "transparent",
+        fg: s.screen === n.k ? c.accentFg : c.muted})),
+
+      isVeiculos: s.screen === "veiculos", isCadastro: s.screen === "cadastro", isPainel: s.screen === "painel",
+      isAbastecer: s.screen === "abastecer", isHistorico: s.screen === "historico", isPostos: s.screen === "postos",
+      isComparativo: s.screen === "comparativo", isConfig: s.screen === "config",
+      goVeiculos: this.go("veiculos"), goCadastro: this.go("cadastro"), goPainel: this.go("painel"),
+      goAbastecer: this.go("abastecer"), goHistorico: this.go("historico"),
+
+      vehicleCards: s.vehicles.map(v => ({
+        titulo: this.vehicleTitle(v), tipo: v.tipo, cor: v.cor, placa: this.fmtPlaca(v.placa) || "SEM PLACA",
+        sub: [v.ano, v.combustivel].filter(Boolean).join(" · "),
+        media: this.mediaKml(v.id) ? this.showConsumo(this.mediaKml(v.id)) + " " + unidade : "—",
+        km: this.dec(this.odo(v), 0) + " km",
+        open: () => this.setState({selectedId: v.id, screen: "painel"})
+      })),
+      vehiclePills: s.vehicles.map(v => ({
+        label: this.vehicleTitle(v), bd: v.id === s.selectedId ? accent : c.line,
+        bg: v.id === s.selectedId ? c.soft : "transparent", fg: v.id === s.selectedId ? accent : c.muted,
+        pick: () => this.setState({selectedId: v.id})
+      })),
+
+      veh: s.veh,
+      onVeh: e => { const {name, value} = e.target; this.setState({veh: Object.assign({}, s.veh, {[name]: value})}); },
+      tipoOpts: pick([{value:"Carro", label:"Carro", icon:"🚗"}, {value:"Moto", label:"Moto", icon:"🏍️"}], s.veh.tipo, v => this.setState({veh: Object.assign({}, s.veh, {tipo: v})})),
+      corOpts: CORES.map(k => ({hex:k.hex, nome:k.nome, bd: s.veh.cor === k.hex ? accent : "transparent",
+        pick: () => this.setState({veh: Object.assign({}, s.veh, {cor:k.hex, corNome:k.nome})})})),
+      fuelOpts: pick(FUELS.map(f => ({value:f, label:f})), s.veh.combustivel, v => this.setState({veh: Object.assign({}, s.veh, {combustivel: v})})),
+      saveVehicle: () => {
+        if (!s.veh.modelo.trim()) return this.toast("Informe ao menos o modelo");
+        const v = Object.assign({}, s.veh, {id: "v" + Date.now(), km: this.numDot(s.veh.km)});
+        this.setState({vehicles: s.vehicles.concat([v]), veh: this.emptyVeh(), selectedId: v.id, screen: "veiculos"});
+        this.toast(this.vehicleTitle(v) + " cadastrado");
+      },
+
+      fill: Object.assign({}, s.fill, {
+        kmHint: this.dec(lastKmVeh + 350, 0),
+        precoCalc: fLitros && fTotal ? this.money(fTotal / fLitros) : "R$ —",
+        rodou: fKm > lastKmVeh ? this.dec(fKm - lastKmVeh, 0) + " km" : "—",
+        cheioLabel: s.fill.cheio ? "✓ Enchi o tanque" : "Abasteci parcial",
+        cheioBd: s.fill.cheio ? accent : c.line, cheioBg: s.fill.cheio ? c.soft : "transparent"
+      }),
+      onFill: e => { const {name, value} = e.target; this.setState({fill: Object.assign({}, s.fill, {[name]: value})}); },
+      toggleCheio: () => this.setState({fill: Object.assign({}, s.fill, {cheio: !s.fill.cheio})}),
+      fillFuelOpts: pick(FUELS.map(f => ({value:f, label:f})), s.fill.combustivel, v => this.setState({fill: Object.assign({}, s.fill, {combustivel: v})})),
+      saveFill: () => {
+        if (!fKm || !fLitros) return this.toast("Informe quilometragem e litros");
+        const nf = {id:"f" + Date.now(), vehicleId: s.selectedId, data: s.fill.data, km: fKm, litros: fLitros,
+          total: fTotal, posto: s.fill.posto || "Posto não informado", combustivel: s.fill.combustivel, cheio: s.fill.cheio};
+        const vehicles = s.vehicles.map(v => v.id === s.selectedId ? Object.assign({}, v, {km: Math.max(v.km||0, fKm)}) : v);
+        this.setState({fills: s.fills.concat([nf]), vehicles, fill: this.emptyFill(), screen: "painel"});
+        this.toast("Abastecimento registrado");
+      },
+
+      stats: {
+        media: media ? this.showConsumo(media) : "—", unidade,
+        custoKm: custoKm ? this.money(custoKm) : "—",
+        ultimoPreco: lastPreco ? this.money(lastPreco) : "—",
+        totalGasto: this.money(totalGasto),
+        resumoLitros: this.dec(totalLitros, 1) + " L em " + selFills.length + " abastecimentos",
+        qtdAbastecimentos: selFills.length + " abastecimentos",
+        tendencia: diff ? (diff > 0 ? "▲ " : "▼ ") + this.dec(Math.abs(diff), 1) + "% vs. o tanque anterior" : "Sem comparação ainda"
+      },
+
+      chart: chartData.map((x, i) => ({
+        val: this.showConsumo(x.kml), h: Math.max(8, (x.kml / maxK) * 100) + "%",
+        color: i === chartData.length - 1 ? accent : c.line,
+        label: (x.fill.data || "").slice(8,10) + "/" + (x.fill.data || "").slice(5,7)
+      })),
+      chartEmpty: chartData.length === 0,
+
+      recentFills: selFills.slice().reverse().slice(0,4).map(f => ({
+        posto: f.posto, data: (f.data||"").slice(8,10) + "/" + (f.data||"").slice(5,7),
+        litros: this.dec(f.litros,1), km: this.dec(f.km,0), total: this.money(f.total),
+        preco: f.litros ? this.money(f.total / f.litros) : "—"
+      })),
+
+      historyRows: selFills.slice().reverse().map(f => {
+        const k = consumoOf(f);
+        return {
+          dia: (f.data||"").slice(8,10), mes: monthNames[parseInt((f.data||"01-01").slice(5,7),10)-1] || "",
+          posto: f.posto, combustivel: f.combustivel, km: this.dec(f.km,0),
+          tag: f.cheio ? "· tanque cheio" : "· parcial",
+          litros: this.dec(f.litros,1), preco: f.litros ? this.money(f.total/f.litros) : "—",
+          consumo: k ? this.showConsumo(k) : "—", consumoCor: k && media && k >= media ? accent : c.fg,
+          total: this.money(f.total),
+          remove: () => { this.setState({fills: s.fills.filter(x => x.id !== f.id)}); this.toast("Abastecimento removido"); }
+        };
+      }),
+      historyEmpty: selFills.length === 0,
+
+      station: s.station,
+      onStation: e => { const {name, value} = e.target; this.setState({station: Object.assign({}, s.station, {[name]: value})}); },
+      saveStation: () => {
+        if (!s.station.nome.trim()) return this.toast("Informe o nome do posto");
+        const p = {gasolina: this.numDot(s.station.gasolina), etanol: this.numDot(s.station.etanol), diesel: this.numDot(s.station.diesel)};
+        const exist = s.stations.find(x => x.nome.toLowerCase() === s.station.nome.trim().toLowerCase());
+        let stations;
+        if (exist) stations = s.stations.map(x => x === exist ? Object.assign({}, x, p, {quando:"agora"}) : x);
+        else stations = s.stations.concat([Object.assign({id:"p"+Date.now(), nome:s.station.nome.trim(), quando:"agora"}, p)]);
+        this.setState({stations, station:{nome:"", gasolina:"", etanol:"", diesel:""}});
+        this.toast("Preços salvos");
+      },
+      stationCards: s.stations.map(p => ({
+        nome: p.nome, quando: p.quando, maisBarato: cheapest && cheapest.id === p.id,
+        precos: [{nome:"Gasolina", valor: p.gasolina ? this.money(p.gasolina) : "—"},
+                 {nome:"Etanol", valor: p.etanol ? this.money(p.etanol) : "—"},
+                 {nome:"Diesel", valor: p.diesel ? this.money(p.diesel) : "—"}],
+        edit: () => this.setState({station: {nome:p.nome, gasolina: p.gasolina ? self.dec(p.gasolina,2) : "", etanol: p.etanol ? self.dec(p.etanol,2) : "", diesel: p.diesel ? self.dec(p.diesel,2) : ""}})
+      })),
+      stationNames: s.stations.map(p => ({nome: p.nome})),
+
+      comp: Object.assign({}, s.comp, {
+        vencedor: !pg || !pe ? "—" : (etanolVence ? "Etanol" : "Gasolina"),
+        cor: !pg || !pe ? c.muted : (etanolVence ? accent : "#1F5FA8"),
+        explicacao: !pg || !pe ? "Informe os dois preços." :
+          (etanolVence
+            ? "O etanol está a " + this.dec(prop*100,0) + "% do preço da gasolina — abaixo do limite de " + this.dec(ratio*100,0) + "%."
+            : "O etanol está a " + this.dec(prop*100,0) + "% do preço da gasolina — acima do limite de " + this.dec(ratio*100,0) + "%."),
+        proporcao: pg ? this.dec(prop*100,0) + "%" : "—",
+        custoG: mediaG ? this.money(pg / mediaG) : "—",
+        custoE: mediaE ? this.money(pe / mediaE) : "—"
+      }),
+      onComp: e => { const {name, value} = e.target; this.setState({comp: Object.assign({}, s.comp, {[name]: value})}); },
+
+      toast: s.toast, hasToast: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

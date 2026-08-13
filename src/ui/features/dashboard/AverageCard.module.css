@@ -1,0 +1,42 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6) var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: 10px;
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: clamp(38px, 9vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.unit {
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+.trend {
+  margin-top: var(--space-3);
+  font-size: 13px;
+  opacity: 0.85;
+}

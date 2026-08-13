@@ -1,0 +1,15 @@
+.card {
+  margin-bottom: var(--space-4);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+  gap: var(--space-4);
+  align-items: end;
+}
+
+.submit {
+  display: flex;
+  align-items: flex-end;
+}

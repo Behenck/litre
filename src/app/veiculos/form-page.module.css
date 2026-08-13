@@ -1,0 +1,5 @@
+/* Formulários ficam mais legíveis com a linha curta. */
+.narrow {
+  max-width: 760px;
+  margin: 0 auto;
+}

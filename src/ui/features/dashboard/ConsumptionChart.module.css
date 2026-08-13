@@ -1,0 +1,57 @@
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 150px;
+}
+
+.column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-2);
+  height: 100%;
+  min-width: 0;
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.bar {
+  width: 100%;
+  min-height: 6px;
+  border-radius: var(--radius-sm) var(--radius-sm) 3px 3px;
+  background: var(--accent);
+  transition: height 0.4s ease;
+}
+
+/* Trecho implausível: sinalizado, não escondido. */
+.suspicious {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--danger),
+    var(--danger) 4px,
+    var(--panel-2) 4px,
+    var(--panel-2) 8px
+  );
+}
+
+.label {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.empty {
+  margin: 0;
+  padding: var(--space-5) 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
