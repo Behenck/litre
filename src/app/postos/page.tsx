@@ -1,5 +1,6 @@
 import { requireUser } from '@/app/auth/current-user';
 import { listStations } from '@/application/use-cases/list-stations';
+import { today } from '@/domain/shared/iso-date';
 import { formatRegion } from '@/domain/shared/region';
 import { getContainer } from '@/infrastructure/container';
 import { EmptyState } from '@/ui/components/EmptyState';
@@ -10,7 +11,8 @@ import { StationForm } from '@/ui/features/stations/StationForm';
 import styles from './postos.module.css';
 
 interface PageProps {
-  searchParams: Promise<{ ok?: string }>;
+  /** `posto`: id do posto clicado em "Novo preço" no card, para preencher o formulário. */
+  searchParams: Promise<{ ok?: string; posto?: string }>;
 }
 
 /**
@@ -21,7 +23,7 @@ interface PageProps {
  * eles na próxima vez que abrirem a tela.
  */
 export default async function StationsPage({ searchParams }: PageProps) {
-  const { ok } = await searchParams;
+  const { ok, posto } = await searchParams;
   const { stations: repository, fillUps } = getContainer();
   const user = await requireUser();
 
@@ -33,6 +35,8 @@ export default async function StationsPage({ searchParams }: PageProps) {
   // Sugere tanto os postos já anotados na cidade quanto os usados nos seus abastecimentos.
   const knownNames = [...new Set([...stations.map((station) => station.name), ...usedNames])];
 
+  const prefillStation = posto ? (stations.find((station) => station.id === posto) ?? null) : null;
+
   return (
     <>
       <PageHeader
@@ -40,7 +44,14 @@ export default async function StationsPage({ searchParams }: PageProps) {
         description="Preços anotados pelos motoristas da sua cidade. O que você anotar aparece para eles também."
       />
 
-      <StationForm knownNames={knownNames} />
+      <div id="anotar-preco">
+        <StationForm
+          key={prefillStation?.id ?? 'novo'}
+          knownNames={knownNames}
+          today={today()}
+          prefill={prefillStation}
+        />
+      </div>
 
       {stations.length === 0 ? (
         <EmptyState

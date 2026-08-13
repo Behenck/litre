@@ -31,6 +31,7 @@ export async function saveStationAction(_previous: ActionState, form: FormData):
     gasolinePrice: gasoline.value,
     ethanolPrice: ethanol.value,
     dieselPrice: diesel.value,
+    priceDate: text(form, 'priceDate'),
   });
 
   if (!result.ok) return toActionState(result.error);

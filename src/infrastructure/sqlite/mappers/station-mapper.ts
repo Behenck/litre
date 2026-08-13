@@ -10,6 +10,7 @@ export interface StationRow {
   gasoline_cents: number | null;
   ethanol_cents: number | null;
   diesel_cents: number | null;
+  price_date: string;
   updated_at: string;
   updated_by: string | null;
   updated_by_name: string;
@@ -26,6 +27,7 @@ export function rowToStation(row: StationRow): Station {
     gasolinePrice: row.gasoline_cents,
     ethanolPrice: row.ethanol_cents,
     dieselPrice: row.diesel_cents,
+    priceDate: row.price_date,
     updatedAt: row.updated_at,
     updatedBy: row.updated_by,
     updatedByName: row.updated_by_name,
@@ -43,6 +45,7 @@ export function stationToRow(station: Station): StationRow {
     gasoline_cents: station.gasolinePrice,
     ethanol_cents: station.ethanolPrice,
     diesel_cents: station.dieselPrice,
+    price_date: station.priceDate,
     updated_at: station.updatedAt,
     updated_by: station.updatedBy,
     updated_by_name: station.updatedByName,

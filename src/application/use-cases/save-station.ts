@@ -2,12 +2,14 @@ import type { StationRepository } from '../ports/station-repository';
 import type { User } from '@/domain/account/user';
 import { ok, type Result } from '@/domain/shared/result';
 import { createStation, type Station } from '@/domain/station/station';
+import { createStationPriceEntry } from '@/domain/station/station-price-entry';
 
 export interface SaveStationInput {
   readonly name: string;
   readonly gasolinePrice: number | null;
   readonly ethanolPrice: number | null;
   readonly dieselPrice: number | null;
+  readonly priceDate: string;
 }
 
 /**
@@ -36,5 +38,6 @@ export async function saveStation(
   const station: Station = existing ? { ...candidate.value, id: existing.id } : candidate.value;
 
   await repository.save(station);
+  await repository.appendPriceHistory(createStationPriceEntry(station));
   return ok(station);
 }

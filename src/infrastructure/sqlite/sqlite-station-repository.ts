@@ -2,12 +2,27 @@ import type { StationRepository } from '@/application/ports/station-repository';
 import type { Id } from '@/domain/shared/id';
 import { RepositoryError } from '@/domain/shared/result';
 import type { Station } from '@/domain/station/station';
+import type { StationPriceEntry } from '@/domain/station/station-price-entry';
 import { getDatabase } from './connection';
 import { ensureSchema } from './migrate';
+import {
+  rowToStationPriceEntry,
+  type StationPriceHistoryRow,
+  stationPriceEntryToRow,
+} from './mappers/station-price-history-mapper';
 import { rowToStation, type StationRow, stationToRow } from './mappers/station-mapper';
 
 const COLUMNS =
-  'id, name, name_key, city, state, region_key, gasoline_cents, ethanol_cents, diesel_cents, updated_at, updated_by, updated_by_name';
+  'id, name, name_key, city, state, region_key, gasoline_cents, ethanol_cents, diesel_cents, price_date, updated_at, updated_by, updated_by_name';
+
+const HISTORY_COLUMNS =
+  'id, station_id, gasoline_cents, ethanol_cents, diesel_cents, price_date, recorded_by, recorded_by_name, recorded_at';
+
+const INSERT_HISTORY = `
+  INSERT INTO station_price_history (${HISTORY_COLUMNS})
+  VALUES (@id, @station_id, @gasoline_cents, @ethanol_cents, @diesel_cents, @price_date, @recorded_by,
+          @recorded_by_name, @recorded_at)
+`;
 
 /**
  * O conflito é resolvido por (`region_key`, `name_key`), não por id: anotar
@@ -17,11 +32,11 @@ const COLUMNS =
 const UPSERT = `
   INSERT INTO stations (${COLUMNS})
   VALUES (@id, @name, @name_key, @city, @state, @region_key, @gasoline_cents, @ethanol_cents, @diesel_cents,
-          @updated_at, @updated_by, @updated_by_name)
+          @price_date, @updated_at, @updated_by, @updated_by_name)
   ON CONFLICT(region_key, name_key) DO UPDATE SET
     name = excluded.name, gasoline_cents = excluded.gasoline_cents,
     ethanol_cents = excluded.ethanol_cents, diesel_cents = excluded.diesel_cents,
-    updated_at = excluded.updated_at, updated_by = excluded.updated_by,
+    price_date = excluded.price_date, updated_at = excluded.updated_at, updated_by = excluded.updated_by,
     updated_by_name = excluded.updated_by_name
 `;
 
@@ -76,6 +91,28 @@ export class SqliteStationRepository implements StationRepository {
       getDatabase().prepare('DELETE FROM stations WHERE id = ?').run(id);
     } catch (cause) {
       throw new RepositoryError('Falha ao excluir o posto.', cause);
+    }
+  }
+
+  async appendPriceHistory(entry: StationPriceEntry): Promise<void> {
+    try {
+      getDatabase().prepare(INSERT_HISTORY).run(stationPriceEntryToRow(entry));
+    } catch (cause) {
+      throw new RepositoryError('Falha ao registrar o histórico de preço.', cause);
+    }
+  }
+
+  async listPriceHistory(stationId: Id): Promise<StationPriceEntry[]> {
+    try {
+      const rows = getDatabase()
+        .prepare(
+          `SELECT ${HISTORY_COLUMNS} FROM station_price_history
+           WHERE station_id = ? ORDER BY price_date DESC, recorded_at DESC`,
+        )
+        .all(stationId) as StationPriceHistoryRow[];
+      return rows.map(rowToStationPriceEntry);
+    } catch (cause) {
+      throw new RepositoryError('Falha ao listar o histórico de preço.', cause);
     }
   }
 }

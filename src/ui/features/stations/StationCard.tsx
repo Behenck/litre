@@ -1,6 +1,8 @@
+import Link from 'next/link';
 import type { Station } from '@/domain/station/station';
+import { ButtonLink } from '@/ui/components/PrimaryButton';
 import { formatMoney } from '@/ui/format/currency';
-import { formatRelative } from '@/ui/format/date';
+import { formatDate, formatRelative } from '@/ui/format/date';
 import { DeleteStationButton } from './DeleteStationButton';
 import styles from './StationCard.module.css';
 
@@ -27,8 +29,11 @@ export function StationCard({ station, cheapest, mine }: StationCardProps) {
         <div className={styles.identity}>
           <h3 className={styles.name}>{station.name}</h3>
           <p className={styles.updated}>
-            Atualizado {formatRelative(station.updatedAt)} por {credit}
+            Preço de {formatDate(station.priceDate)} · atualizado {formatRelative(station.updatedAt)} por {credit}
           </p>
+          <Link href={`/postos/${station.id}/historico`} className={styles.historyLink}>
+            Ver histórico
+          </Link>
         </div>
         {cheapest ? <span className={styles.badge}>mais barato</span> : null}
       </header>
@@ -41,6 +46,10 @@ export function StationCard({ station, cheapest, mine }: StationCardProps) {
           </div>
         ))}
       </dl>
+
+      <ButtonLink href={`/postos?posto=${station.id}#anotar-preco`} variant="ghost" full className={styles.newPrice}>
+        Novo preço
+      </ButtonLink>
 
       {mine ? <DeleteStationButton stationId={station.id} stationName={station.name} /> : null}
     </article>

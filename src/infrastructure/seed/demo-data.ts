@@ -6,6 +6,8 @@
  * carregar o exemplo ao mesmo tempo sem colidir.
  */
 
+import { toIsoDate } from '@/domain/shared/iso-date';
+
 export const DEMO_VEHICLES = [
   {
     id: 'seed-v1',
@@ -54,6 +56,11 @@ export const DEMO_STATIONS = [
 
 export function daysAgo(days: number): string {
   return new Date(Date.now() - days * 86_400_000).toISOString();
+}
+
+/** Mesmo intervalo de `daysAgo`, mas como `IsoDate` (`YYYY-MM-DD`), para `price_date`. */
+export function daysAgoDate(days: number): string {
+  return toIsoDate(new Date(Date.now() - days * 86_400_000));
 }
 
 /** Id do exemplo dentro da conta: previsível, para restaurar sobrescrever o anterior. */

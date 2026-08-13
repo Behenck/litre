@@ -2,11 +2,15 @@ import type { StationRepository } from '@/application/ports/station-repository';
 import type { Id } from '@/domain/shared/id';
 import { RepositoryError } from '@/domain/shared/result';
 import type { Station } from '@/domain/station/station';
+import type { StationPriceEntry } from '@/domain/station/station-price-entry';
 import { getSupabaseClient } from './client';
-import { rowToStation, stationToRow } from './mappers';
+import { rowToStation, rowToStationPriceEntry, stationPriceEntryToRow, stationToRow } from './mappers';
 
 const COLUMNS =
-  'id, name, name_key, city, state, region_key, gasoline_cents, ethanol_cents, diesel_cents, updated_at, updated_by, updated_by_name';
+  'id, name, name_key, city, state, region_key, gasoline_cents, ethanol_cents, diesel_cents, price_date, updated_at, updated_by, updated_by_name';
+
+const HISTORY_COLUMNS =
+  'id, station_id, gasoline_cents, ethanol_cents, diesel_cents, price_date, recorded_by, recorded_by_name, recorded_at';
 
 /**
  * O posto é o único dado coletivo do app: o escopo das consultas é a praça
@@ -70,6 +74,30 @@ export class SupabaseStationRepository implements StationRepository {
       if (error) throw error;
     } catch (cause) {
       throw new RepositoryError('Falha ao excluir o posto.', cause);
+    }
+  }
+
+  async appendPriceHistory(entry: StationPriceEntry): Promise<void> {
+    try {
+      const { error } = await getSupabaseClient().from('station_price_history').insert(stationPriceEntryToRow(entry));
+      if (error) throw error;
+    } catch (cause) {
+      throw new RepositoryError('Falha ao registrar o histórico de preço.', cause);
+    }
+  }
+
+  async listPriceHistory(stationId: Id): Promise<StationPriceEntry[]> {
+    try {
+      const { data, error } = await getSupabaseClient()
+        .from('station_price_history')
+        .select(HISTORY_COLUMNS)
+        .eq('station_id', stationId)
+        .order('price_date', { ascending: false })
+        .order('recorded_at', { ascending: false });
+      if (error) throw error;
+      return data.map(rowToStationPriceEntry);
+    } catch (cause) {
+      throw new RepositoryError('Falha ao listar o histórico de preço.', cause);
     }
   }
 }

@@ -1,4 +1,5 @@
 import type { Station } from '@/domain/station/station';
+import type { StationPriceEntry } from '@/domain/station/station-price-entry';
 import type { Id } from '@/domain/shared/id';
 
 /**
@@ -16,4 +17,8 @@ export interface StationRepository {
   findByNameKey(regionKey: string, nameKey: string): Promise<Station | null>;
   save(station: Station): Promise<void>;
   delete(id: Id): Promise<void>;
+  /** Acrescenta uma anotação ao histórico do posto — nunca editado, só criado. */
+  appendPriceHistory(entry: StationPriceEntry): Promise<void>;
+  /** Histórico do posto, mais recente primeiro (`priceDate`, depois `recordedAt`). */
+  listPriceHistory(stationId: Id): Promise<StationPriceEntry[]>;
 }

@@ -1,7 +1,7 @@
 import type { SeedDataSource } from '@/application/ports/seed-data-source';
 import type { User } from '@/domain/account/user';
 import { RepositoryError } from '@/domain/shared/result';
-import { DEMO_FILL_UPS, DEMO_STATIONS, DEMO_VEHICLES, daysAgo, seedId } from '../seed/demo-data';
+import { DEMO_FILL_UPS, DEMO_STATIONS, DEMO_VEHICLES, daysAgo, daysAgoDate, seedId } from '../seed/demo-data';
 import { getSupabaseClient } from './client';
 import type { Tables } from './database.types';
 
@@ -40,6 +40,7 @@ function stationsFor(user: User): Tables<'stations'>[] {
     gasoline_cents: gasoline,
     ethanol_cents: ethanol,
     diesel_cents: diesel,
+    price_date: daysAgoDate(days),
     updated_at: daysAgo(days),
     updated_by: user.id,
     updated_by_name: user.name,

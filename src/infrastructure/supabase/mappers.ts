@@ -1,6 +1,7 @@
 import type { FillUp } from '@/domain/fill-up/fill-up';
 import type { Id } from '@/domain/shared/id';
 import type { Station } from '@/domain/station/station';
+import type { StationPriceEntry } from '@/domain/station/station-price-entry';
 import type { FuelType } from '@/domain/vehicle/fuel-type';
 import type { Vehicle, VehicleType } from '@/domain/vehicle/vehicle';
 import type { Tables } from './database.types';
@@ -8,6 +9,7 @@ import type { Tables } from './database.types';
 type VehicleRow = Tables<'vehicles'>;
 type FillUpRow = Tables<'fill_ups'>;
 type StationRow = Tables<'stations'>;
+type StationPriceHistoryRow = Tables<'station_price_history'>;
 
 export function rowToVehicle(row: VehicleRow): Vehicle {
   return {
@@ -86,6 +88,7 @@ export function rowToStation(row: StationRow): Station {
     gasolinePrice: row.gasoline_cents,
     ethanolPrice: row.ethanol_cents,
     dieselPrice: row.diesel_cents,
+    priceDate: row.price_date,
     updatedAt: row.updated_at,
     updatedBy: row.updated_by,
     updatedByName: row.updated_by_name,
@@ -103,8 +106,37 @@ export function stationToRow(station: Station): StationRow {
     gasoline_cents: station.gasolinePrice,
     ethanol_cents: station.ethanolPrice,
     diesel_cents: station.dieselPrice,
+    price_date: station.priceDate,
     updated_at: station.updatedAt,
     updated_by: station.updatedBy,
     updated_by_name: station.updatedByName,
+  };
+}
+
+export function rowToStationPriceEntry(row: StationPriceHistoryRow): StationPriceEntry {
+  return {
+    id: row.id,
+    stationId: row.station_id,
+    gasolinePrice: row.gasoline_cents,
+    ethanolPrice: row.ethanol_cents,
+    dieselPrice: row.diesel_cents,
+    priceDate: row.price_date,
+    recordedBy: row.recorded_by,
+    recordedByName: row.recorded_by_name,
+    recordedAt: row.recorded_at,
+  };
+}
+
+export function stationPriceEntryToRow(entry: StationPriceEntry): StationPriceHistoryRow {
+  return {
+    id: entry.id,
+    station_id: entry.stationId,
+    gasoline_cents: entry.gasolinePrice,
+    ethanol_cents: entry.ethanolPrice,
+    diesel_cents: entry.dieselPrice,
+    price_date: entry.priceDate,
+    recorded_by: entry.recordedBy,
+    recorded_by_name: entry.recordedByName,
+    recorded_at: entry.recordedAt,
   };
 }

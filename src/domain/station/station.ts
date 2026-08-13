@@ -8,7 +8,7 @@
  */
 
 import { type Id, newId } from '../shared/id';
-import { nowTimestamp } from '../shared/iso-date';
+import { isFutureDate, isValidIsoDate, type IsoDate, nowTimestamp } from '../shared/iso-date';
 import type { Money } from '../shared/money';
 import { normalizeKey } from '../shared/normalize';
 import { createRegion } from '../shared/region';
@@ -24,6 +24,8 @@ export interface Station {
   readonly gasolinePrice: Money | null;
   readonly ethanolPrice: Money | null;
   readonly dieselPrice: Money | null;
+  /** Data em que o motorista viu esses preços — diferente de `updatedAt`. */
+  readonly priceDate: IsoDate;
   readonly updatedAt: string;
   /** Quem anotou o preço por último — vira o crédito no card. */
   readonly updatedBy: Id | null;
@@ -38,6 +40,7 @@ export interface StationInput {
   readonly gasolinePrice: Money | null;
   readonly ethanolPrice: Money | null;
   readonly dieselPrice: Money | null;
+  readonly priceDate: IsoDate;
   readonly updatedAt?: string;
   readonly updatedBy?: Id | null;
   readonly updatedByName?: string;
@@ -77,6 +80,13 @@ export function createStation(input: StationInput): Result<Station> {
   const diesel = validatePrice(input.dieselPrice, 'diesel', 'diesel');
   if (!diesel.ok) return diesel;
 
+  if (!isValidIsoDate(input.priceDate)) {
+    return fail('valor-invalido', 'Informe uma data válida para o preço.', 'priceDate');
+  }
+  if (isFutureDate(input.priceDate)) {
+    return fail('data-futura', 'A data do preço não pode estar no futuro.', 'priceDate');
+  }
+
   return ok({
     id: input.id ?? newId(),
     name,
@@ -87,6 +97,7 @@ export function createStation(input: StationInput): Result<Station> {
     gasolinePrice: gasoline.value,
     ethanolPrice: ethanol.value,
     dieselPrice: diesel.value,
+    priceDate: input.priceDate,
     updatedAt: input.updatedAt ?? nowTimestamp(),
     updatedBy: input.updatedBy ?? null,
     updatedByName: input.updatedByName?.trim() ?? '',

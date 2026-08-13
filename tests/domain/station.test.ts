@@ -14,6 +14,7 @@ function station(id: string, gasolinePrice: number | null): Station {
     gasolinePrice,
     ethanolPrice: null,
     dieselPrice: null,
+    priceDate: '2026-08-13',
     updatedAt: '2026-08-13T10:00:00.000Z',
     updatedBy: null,
     updatedByName: '',
@@ -37,12 +38,14 @@ describe('createStation', () => {
       gasolinePrice: 629,
       ethanolPrice: 419,
       dieselPrice: 589,
+      priceDate: '2026-08-13',
     });
 
     assert.equal(result.ok, true);
     if (result.ok) {
       assert.equal(result.value.nameKey, 'shell av. brasil');
       assert.equal(result.value.gasolinePrice, 629);
+      assert.equal(result.value.priceDate, '2026-08-13');
     }
   });
 
@@ -54,6 +57,7 @@ describe('createStation', () => {
       gasolinePrice: null,
       ethanolPrice: null,
       dieselPrice: null,
+      priceDate: '2026-08-13',
     });
     assert.equal(result.ok, true);
   });
@@ -66,6 +70,7 @@ describe('createStation', () => {
       gasolinePrice: 629,
       ethanolPrice: null,
       dieselPrice: null,
+      priceDate: '2026-08-13',
     });
     assert.equal(result.ok, false);
     if (!result.ok) assert.equal(result.error.field, 'name');
@@ -79,6 +84,7 @@ describe('createStation', () => {
       gasolinePrice: 619,
       ethanolPrice: null,
       dieselPrice: null,
+      priceDate: '2026-08-13',
     });
     const joinville = createStation({
       name: 'Ipiranga Centro',
@@ -87,6 +93,7 @@ describe('createStation', () => {
       gasolinePrice: 609,
       ethanolPrice: null,
       dieselPrice: null,
+      priceDate: '2026-08-13',
     });
 
     assert.equal(curitiba.ok && joinville.ok, true);
@@ -104,6 +111,7 @@ describe('createStation', () => {
       gasolinePrice: 619,
       ethanolPrice: null,
       dieselPrice: null,
+      priceDate: '2026-08-13',
     });
     assert.equal(result.ok, false);
     if (!result.ok) assert.equal(result.error.field, 'state');
@@ -117,9 +125,38 @@ describe('createStation', () => {
       gasolinePrice: 0,
       ethanolPrice: null,
       dieselPrice: null,
+      priceDate: '2026-08-13',
     });
     assert.equal(result.ok, false);
     if (!result.ok) assert.equal(result.error.field, 'gasoline');
+  });
+
+  it('recusa data de preço inválida', () => {
+    const result = createStation({
+      name: 'Posto',
+      city: 'Curitiba',
+      state: 'PR',
+      gasolinePrice: 619,
+      ethanolPrice: null,
+      dieselPrice: null,
+      priceDate: '2026-13-40',
+    });
+    assert.equal(result.ok, false);
+    if (!result.ok) assert.equal(result.error.field, 'priceDate');
+  });
+
+  it('recusa data de preço no futuro', () => {
+    const result = createStation({
+      name: 'Posto',
+      city: 'Curitiba',
+      state: 'PR',
+      gasolinePrice: 619,
+      ethanolPrice: null,
+      dieselPrice: null,
+      priceDate: '2099-01-01',
+    });
+    assert.equal(result.ok, false);
+    if (!result.ok) assert.equal(result.error.code, 'data-futura');
   });
 });
 

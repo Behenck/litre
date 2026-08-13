@@ -67,9 +67,22 @@ type StationRow = {
   gasoline_cents: number | null;
   ethanol_cents: number | null;
   diesel_cents: number | null;
+  price_date: string;
   updated_at: string;
   updated_by: string | null;
   updated_by_name: string;
+};
+
+type StationPriceHistoryRow = {
+  id: string;
+  station_id: string;
+  gasoline_cents: number | null;
+  ethanol_cents: number | null;
+  diesel_cents: number | null;
+  price_date: string;
+  recorded_by: string | null;
+  recorded_by_name: string;
+  recorded_at: string;
 };
 
 /** Toda tabela com `user_id` aponta para a mesma conta dona do dado. */
@@ -128,6 +141,20 @@ export type Database = {
         Insert: StationRow;
         Update: Partial<StationRow>;
         Relationships: [];
+      };
+      station_price_history: {
+        Row: StationPriceHistoryRow;
+        Insert: StationPriceHistoryRow;
+        Update: Partial<StationPriceHistoryRow>;
+        Relationships: [
+          {
+            foreignKeyName: 'station_price_history_station_id_fkey';
+            columns: ['station_id'];
+            isOneToOne: false;
+            referencedRelation: 'stations';
+            referencedColumns: ['id'];
+          },
+        ];
       };
     };
     Views: Record<string, never>;
