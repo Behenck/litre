@@ -1,4 +1,5 @@
 import type { EmailVerification } from '@/domain/account/email-verification';
+import type { PasswordReset } from '@/domain/account/password-reset';
 import type { Session } from '@/domain/account/session';
 import type { User } from '@/domain/account/user';
 import type { Tables } from './database.types';
@@ -6,6 +7,7 @@ import type { Tables } from './database.types';
 type UserRow = Tables<'users'>;
 type SessionRow = Tables<'sessions'>;
 type EmailVerificationRow = Tables<'email_verifications'>;
+type PasswordResetRow = Tables<'password_resets'>;
 
 export function rowToUser(row: UserRow): User {
   return {
@@ -70,5 +72,23 @@ export function verificationToRow(verification: EmailVerification): EmailVerific
     user_id: verification.userId,
     expires_at: verification.expiresAt,
     created_at: verification.createdAt,
+  };
+}
+
+export function rowToPasswordReset(row: PasswordResetRow): PasswordReset {
+  return {
+    tokenHash: row.token_hash,
+    userId: row.user_id,
+    expiresAt: row.expires_at,
+    createdAt: row.created_at,
+  };
+}
+
+export function passwordResetToRow(reset: PasswordReset): PasswordResetRow {
+  return {
+    token_hash: reset.tokenHash,
+    user_id: reset.userId,
+    expires_at: reset.expiresAt,
+    created_at: reset.createdAt,
   };
 }

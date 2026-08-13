@@ -57,3 +57,11 @@
 .submit {
   margin-top: var(--space-1);
 }
+
+.forgot {
+  align-self: flex-end;
+  margin-top: calc(var(--space-4) * -1);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}

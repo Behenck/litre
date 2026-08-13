@@ -1,4 +1,5 @@
 import type { EmailVerificationRepository } from '@/application/ports/email-verification-repository';
+import type { PasswordResetRepository } from '@/application/ports/password-reset-repository';
 import type { SessionRepository } from '@/application/ports/session-repository';
 import type { UserRepository } from '@/application/ports/user-repository';
 import { RepositoryError } from '@/domain/shared/result';
@@ -47,6 +48,18 @@ export class UnsupportedSessionRepository implements SessionRepository {
 }
 
 export class UnsupportedEmailVerificationRepository implements EmailVerificationRepository {
+  async findByTokenHash(): Promise<never> {
+    return unsupported();
+  }
+  async save(): Promise<never> {
+    return unsupported();
+  }
+  async deleteByUser(): Promise<never> {
+    return unsupported();
+  }
+}
+
+export class UnsupportedPasswordResetRepository implements PasswordResetRepository {
   async findByTokenHash(): Promise<never> {
     return unsupported();
   }

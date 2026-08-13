@@ -10,6 +10,13 @@ export interface VerificationMessage {
   readonly link: string;
 }
 
+export interface PasswordResetMessage {
+  readonly to: string;
+  readonly name: string;
+  readonly link: string;
+}
+
 export interface Mailer {
   sendVerification(message: VerificationMessage): Promise<void>;
+  sendPasswordReset(message: PasswordResetMessage): Promise<void>;
 }

@@ -3,7 +3,9 @@
 import { redirect } from 'next/navigation';
 import { authenticate } from '@/application/use-cases/authenticate';
 import { registerAccount } from '@/application/use-cases/register-account';
+import { requestPasswordReset } from '@/application/use-cases/request-password-reset';
 import { resendVerification } from '@/application/use-cases/resend-verification';
+import { resetPassword } from '@/application/use-cases/reset-password';
 import { sendVerification } from '@/application/use-cases/send-verification';
 import { signOut } from '@/application/use-cases/sign-out';
 import type { User } from '@/domain/account/user';
@@ -14,6 +16,10 @@ import { text } from './form-parsing';
 /** O link que chega no e-mail. A rota é decisão da UI, não do caso de uso. */
 function verificationLink(token: string): string {
   return `${appUrl()}/verificar?token=${encodeURIComponent(token)}`;
+}
+
+function passwordResetLink(token: string): string {
+  return `${appUrl()}/redefinir-senha?token=${encodeURIComponent(token)}`;
 }
 
 /**
@@ -97,4 +103,36 @@ export async function resendVerificationAction(_previous: ActionState, form: For
   }
 
   return { status: 'success', message: 'E-mail reenviado. Confira a caixa de entrada e o spam.' };
+}
+
+const PASSWORD_RESET_REQUESTED = 'Se esse e-mail tiver conta, enviamos um link de redefinição. Confira a caixa de entrada e o spam.';
+
+export async function requestPasswordResetAction(_previous: ActionState, form: FormData): Promise<ActionState> {
+  const { users, passwordResets, secrets, mailer } = getContainer();
+
+  try {
+    await requestPasswordReset(
+      { users, resets: passwordResets, secrets, mailer, resetLink: passwordResetLink },
+      text(form, 'email'),
+    );
+  } catch (error) {
+    console.error('Falha ao enviar o e-mail de redefinição de senha:', error);
+    return errorState('Não conseguimos enviar o e-mail agora. Tente de novo em alguns minutos.');
+  }
+
+  return { status: 'success', message: PASSWORD_RESET_REQUESTED };
+}
+
+export async function resetPasswordAction(_previous: ActionState, form: FormData): Promise<ActionState> {
+  const { users, passwordResets, passwords, secrets } = getContainer();
+
+  const result = await resetPassword(
+    { users, resets: passwordResets, passwords, secrets },
+    { token: text(form, 'token'), password: text(form, 'password') },
+  );
+
+  if (!result.ok) return toActionState(result.error);
+
+  const query = new URLSearchParams({ ok: 'Senha redefinida. Entre com a nova senha.' });
+  redirect(`/entrar?${query.toString()}`);
 }

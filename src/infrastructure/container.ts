@@ -2,6 +2,7 @@ import type { EmailVerificationRepository } from '@/application/ports/email-veri
 import type { FillUpRepository } from '@/application/ports/fill-up-repository';
 import type { Mailer } from '@/application/ports/mailer';
 import type { PasswordHasher } from '@/application/ports/password-hasher';
+import type { PasswordResetRepository } from '@/application/ports/password-reset-repository';
 import type { PreferencesStore } from '@/application/ports/preferences-store';
 import type { SecretTokens } from '@/application/ports/secret-tokens';
 import type { SeedDataSource } from '@/application/ports/seed-data-source';
@@ -23,11 +24,13 @@ import { SqliteStationRepository } from './sqlite/sqlite-station-repository';
 import { SqliteVehicleRepository } from './sqlite/sqlite-vehicle-repository';
 import {
   UnsupportedEmailVerificationRepository,
+  UnsupportedPasswordResetRepository,
   UnsupportedSessionRepository,
   UnsupportedUserRepository,
 } from './sqlite/unsupported-auth';
 import { SupabaseEmailVerificationRepository } from './supabase/supabase-email-verification-repository';
 import { SupabaseFillUpRepository } from './supabase/supabase-fill-up-repository';
+import { SupabasePasswordResetRepository } from './supabase/supabase-password-reset-repository';
 import { SupabaseSeedDataSource } from './supabase/supabase-seed-data-source';
 import { SupabaseSessionRepository } from './supabase/supabase-session-repository';
 import { SupabaseStationRepository } from './supabase/supabase-station-repository';
@@ -52,6 +55,7 @@ export interface Container {
   readonly users: UserRepository;
   readonly sessions: SessionRepository;
   readonly verifications: EmailVerificationRepository;
+  readonly passwordResets: PasswordResetRepository;
   readonly passwords: PasswordHasher;
   readonly tokens: SessionTokens;
   readonly secrets: SecretTokens;
@@ -89,6 +93,7 @@ function buildContainer(): Container {
         users: new UnsupportedUserRepository(),
         sessions: new UnsupportedSessionRepository(),
         verifications: new UnsupportedEmailVerificationRepository(),
+        passwordResets: new UnsupportedPasswordResetRepository(),
         seed: new SqliteSeedDataSource(),
       };
     case 'supabase':
@@ -100,6 +105,7 @@ function buildContainer(): Container {
         users: new SupabaseUserRepository(),
         sessions: new SupabaseSessionRepository(),
         verifications: new SupabaseEmailVerificationRepository(),
+        passwordResets: new SupabasePasswordResetRepository(),
         seed: new SupabaseSeedDataSource(),
       };
     default:

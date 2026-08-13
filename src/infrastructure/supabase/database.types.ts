@@ -27,6 +27,13 @@ type EmailVerificationRow = {
   created_at: string;
 };
 
+type PasswordResetRow = {
+  token_hash: string;
+  user_id: string;
+  expires_at: string;
+  created_at: string;
+};
+
 type VehicleRow = {
   id: string;
   user_id: string;
@@ -114,6 +121,12 @@ export type Database = {
         Insert: EmailVerificationRow;
         Update: Partial<EmailVerificationRow>;
         Relationships: [UserRelation<'email_verifications_user_id_fkey'>];
+      };
+      password_resets: {
+        Row: PasswordResetRow;
+        Insert: PasswordResetRow;
+        Update: Partial<PasswordResetRow>;
+        Relationships: [UserRelation<'password_resets_user_id_fkey'>];
       };
       vehicles: {
         Row: VehicleRow;

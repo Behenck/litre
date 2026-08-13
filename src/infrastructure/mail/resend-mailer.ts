@@ -1,7 +1,8 @@
 import 'server-only';
 
-import type { Mailer, VerificationMessage } from '@/application/ports/mailer';
-import { verificationEmail } from './verification-email';
+import type { Mailer, PasswordResetMessage, VerificationMessage } from '@/application/ports/mailer';
+import { passwordResetEmail } from './password-reset-email';
+import { type EmailBody, verificationEmail } from './verification-email';
 
 /**
  * Envio pelo Resend, via HTTP direto.
@@ -27,12 +28,18 @@ export class MailError extends Error {
 
 export class ResendMailer implements Mailer {
   async sendVerification(message: VerificationMessage): Promise<void> {
+    await this.send(message.to, verificationEmail(message));
+  }
+
+  async sendPasswordReset(message: PasswordResetMessage): Promise<void> {
+    await this.send(message.to, passwordResetEmail(message));
+  }
+
+  private async send(to: string, body: EmailBody): Promise<void> {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-      throw new MailError('Configure RESEND_API_KEY para enviar o e-mail de confirmação.');
+      throw new MailError('Configure RESEND_API_KEY para enviar o e-mail.');
     }
-
-    const body = verificationEmail(message);
 
     let response: Response;
     try {
@@ -41,7 +48,7 @@ export class ResendMailer implements Mailer {
         headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           from: process.env.LITRO_MAIL_FROM ?? DEFAULT_FROM,
-          to: [message.to],
+          to: [to],
           subject: body.subject,
           html: body.html,
           text: body.text,

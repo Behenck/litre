@@ -85,3 +85,8 @@ export function markVerified(user: User, at: string = nowTimestamp()): User {
 export function moveTo(user: User, region: Region): User {
   return { ...user, city: region.city, state: region.state, regionKey: region.key };
 }
+
+/** Troca o hash da senha — usado na redefinição via link de e-mail. */
+export function changePasswordHash(user: User, passwordHash: string): User {
+  return { ...user, passwordHash };
+}
