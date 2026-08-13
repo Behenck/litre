@@ -54,6 +54,7 @@ describe('createUser', () => {
       assert.equal(result.value.regionKey, 'PR:curitiba');
       assert.equal(result.value.emailVerifiedAt, null);
       assert.equal(isVerified(result.value), false);
+      assert.equal(result.value.role, 'membro');
     }
   });
 

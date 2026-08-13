@@ -1,5 +1,6 @@
 import { requireUser } from '@/app/auth/current-user';
 import { listStations } from '@/application/use-cases/list-stations';
+import { isAdmin } from '@/domain/account/role';
 import { today } from '@/domain/shared/iso-date';
 import { formatRegion } from '@/domain/shared/region';
 import { getContainer } from '@/infrastructure/container';
@@ -66,6 +67,7 @@ export default async function StationsPage({ searchParams }: PageProps) {
               station={station}
               cheapest={station.id === cheapestId}
               mine={station.updatedBy === null || station.updatedBy === user.id}
+              canDelete={isAdmin(user) || station.createdBy === null || station.createdBy === user.id}
             />
           ))}
         </div>

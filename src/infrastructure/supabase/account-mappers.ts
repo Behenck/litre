@@ -1,5 +1,6 @@
 import type { EmailVerification } from '@/domain/account/email-verification';
 import type { PasswordReset } from '@/domain/account/password-reset';
+import type { Role } from '@/domain/account/role';
 import type { Session } from '@/domain/account/session';
 import type { User } from '@/domain/account/user';
 import type { Tables } from './database.types';
@@ -19,6 +20,7 @@ export function rowToUser(row: UserRow): User {
     state: row.state,
     regionKey: row.region_key,
     emailVerifiedAt: row.email_verified_at,
+    role: row.role as Role,
     createdAt: row.created_at,
   };
 }
@@ -33,6 +35,7 @@ export function userToRow(user: User): UserRow {
     state: user.state,
     region_key: user.regionKey,
     email_verified_at: user.emailVerifiedAt,
+    role: user.role,
     created_at: user.createdAt,
   };
 }

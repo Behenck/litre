@@ -5,7 +5,7 @@ import { RepositoryError } from '@/domain/shared/result';
 import { rowToUser, userToRow } from './account-mappers';
 import { getSupabaseClient } from './client';
 
-const COLUMNS = 'id, name, email, password_hash, city, state, region_key, email_verified_at, created_at';
+const COLUMNS = 'id, name, email, password_hash, city, state, region_key, email_verified_at, role, created_at';
 
 export class SupabaseUserRepository implements UserRepository {
   async findById(id: Id): Promise<User | null> {

@@ -92,6 +92,8 @@ export function rowToStation(row: StationRow): Station {
     updatedAt: row.updated_at,
     updatedBy: row.updated_by,
     updatedByName: row.updated_by_name,
+    createdBy: row.created_by,
+    createdByName: row.created_by_name,
   };
 }
 
@@ -110,6 +112,8 @@ export function stationToRow(station: Station): StationRow {
     updated_at: station.updatedAt,
     updated_by: station.updatedBy,
     updated_by_name: station.updatedByName,
+    created_by: station.createdBy,
+    created_by_name: station.createdByName,
   };
 }
 

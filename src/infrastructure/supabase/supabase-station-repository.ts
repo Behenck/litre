@@ -7,7 +7,7 @@ import { getSupabaseClient } from './client';
 import { rowToStation, rowToStationPriceEntry, stationPriceEntryToRow, stationToRow } from './mappers';
 
 const COLUMNS =
-  'id, name, name_key, city, state, region_key, gasoline_cents, ethanol_cents, diesel_cents, price_date, updated_at, updated_by, updated_by_name';
+  'id, name, name_key, city, state, region_key, gasoline_cents, ethanol_cents, diesel_cents, price_date, updated_at, updated_by, updated_by_name, created_by, created_by_name';
 
 const HISTORY_COLUMNS =
   'id, station_id, gasoline_cents, ethanol_cents, diesel_cents, price_date, recorded_by, recorded_by_name, recorded_at';

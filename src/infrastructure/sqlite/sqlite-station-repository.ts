@@ -13,7 +13,7 @@ import {
 import { rowToStation, type StationRow, stationToRow } from './mappers/station-mapper';
 
 const COLUMNS =
-  'id, name, name_key, city, state, region_key, gasoline_cents, ethanol_cents, diesel_cents, price_date, updated_at, updated_by, updated_by_name';
+  'id, name, name_key, city, state, region_key, gasoline_cents, ethanol_cents, diesel_cents, price_date, updated_at, updated_by, updated_by_name, created_by, created_by_name';
 
 const HISTORY_COLUMNS =
   'id, station_id, gasoline_cents, ethanol_cents, diesel_cents, price_date, recorded_by, recorded_by_name, recorded_at';
@@ -32,12 +32,13 @@ const INSERT_HISTORY = `
 const UPSERT = `
   INSERT INTO stations (${COLUMNS})
   VALUES (@id, @name, @name_key, @city, @state, @region_key, @gasoline_cents, @ethanol_cents, @diesel_cents,
-          @price_date, @updated_at, @updated_by, @updated_by_name)
+          @price_date, @updated_at, @updated_by, @updated_by_name, @created_by, @created_by_name)
   ON CONFLICT(region_key, name_key) DO UPDATE SET
     name = excluded.name, gasoline_cents = excluded.gasoline_cents,
     ethanol_cents = excluded.ethanol_cents, diesel_cents = excluded.diesel_cents,
     price_date = excluded.price_date, updated_at = excluded.updated_at, updated_by = excluded.updated_by,
-    updated_by_name = excluded.updated_by_name
+    updated_by_name = excluded.updated_by_name, created_by = excluded.created_by,
+    created_by_name = excluded.created_by_name
 `;
 
 export class SqliteStationRepository implements StationRepository {

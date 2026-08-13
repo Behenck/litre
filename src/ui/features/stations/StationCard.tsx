@@ -10,11 +10,13 @@ interface StationCardProps {
   station: Station;
   /** Recebe o selo de destaque (FR-027). */
   cheapest: boolean;
-  /** Quem anotou o preço por último pode remover o posto; os demais só corrigem. */
+  /** Quem anotou o preço por último ganha o crédito no card. */
   mine: boolean;
+  /** Quem criou o posto, ou um admin, pode remover; os demais só corrigem o preço. */
+  canDelete: boolean;
 }
 
-export function StationCard({ station, cheapest, mine }: StationCardProps) {
+export function StationCard({ station, cheapest, mine, canDelete }: StationCardProps) {
   const prices = [
     { label: 'Gasolina', value: station.gasolinePrice },
     { label: 'Etanol', value: station.ethanolPrice },
@@ -51,7 +53,7 @@ export function StationCard({ station, cheapest, mine }: StationCardProps) {
         Novo preço
       </ButtonLink>
 
-      {mine ? <DeleteStationButton stationId={station.id} stationName={station.name} /> : null}
+      {canDelete ? <DeleteStationButton stationId={station.id} stationName={station.name} /> : null}
     </article>
   );
 }

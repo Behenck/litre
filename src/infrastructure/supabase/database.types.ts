@@ -9,6 +9,7 @@ type UserRow = {
   state: string;
   region_key: string;
   email_verified_at: string | null;
+  role: string;
   created_at: string;
 };
 
@@ -78,6 +79,8 @@ type StationRow = {
   updated_at: string;
   updated_by: string | null;
   updated_by_name: string;
+  created_by: string | null;
+  created_by_name: string;
 };
 
 type StationPriceHistoryRow = {

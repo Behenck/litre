@@ -47,8 +47,8 @@ export function resetSeedData(user: User): void {
 
     // O posto é coletivo: entra na praça do motorista e atualiza o que já existe lá.
     const upsertStation = db.prepare(`
-      INSERT INTO stations (id, name, name_key, city, state, region_key, gasoline_cents, ethanol_cents, diesel_cents, price_date, updated_at, updated_by, updated_by_name)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO stations (id, name, name_key, city, state, region_key, gasoline_cents, ethanol_cents, diesel_cents, price_date, updated_at, updated_by, updated_by_name, created_by, created_by_name)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(region_key, name_key) DO UPDATE SET
         gasoline_cents = excluded.gasoline_cents, ethanol_cents = excluded.ethanol_cents,
         diesel_cents = excluded.diesel_cents, price_date = excluded.price_date,
@@ -67,6 +67,8 @@ export function resetSeedData(user: User): void {
         diesel,
         daysAgoDate(days),
         daysAgo(days),
+        user.id,
+        user.name,
         user.id,
         user.name,
       );

@@ -18,6 +18,8 @@ function station(id: string, gasolinePrice: number | null): Station {
     updatedAt: '2026-08-13T10:00:00.000Z',
     updatedBy: null,
     updatedByName: '',
+    createdBy: null,
+    createdByName: '',
   };
 }
 
@@ -46,6 +48,28 @@ describe('createStation', () => {
       assert.equal(result.value.nameKey, 'shell av. brasil');
       assert.equal(result.value.gasolinePrice, 629);
       assert.equal(result.value.priceDate, '2026-08-13');
+    }
+  });
+
+  it('guarda quem criou o posto, separado de quem anotou por último', () => {
+    const result = createStation({
+      name: 'Shell Av. Brasil',
+      city: 'Curitiba',
+      state: 'PR',
+      gasolinePrice: 629,
+      ethanolPrice: null,
+      dieselPrice: null,
+      priceDate: '2026-08-13',
+      createdBy: 'user-1',
+      createdByName: 'Denilson',
+      updatedBy: 'user-2',
+      updatedByName: 'Outro motorista',
+    });
+
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(result.value.createdBy, 'user-1');
+      assert.equal(result.value.updatedBy, 'user-2');
     }
   });
 

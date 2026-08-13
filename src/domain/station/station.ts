@@ -30,6 +30,9 @@ export interface Station {
   /** Quem anotou o preço por último — vira o crédito no card. */
   readonly updatedBy: Id | null;
   readonly updatedByName: string;
+  /** Quem criou o posto — nunca muda depois, mesmo quando outro motorista atualiza o preço. */
+  readonly createdBy: Id | null;
+  readonly createdByName: string;
 }
 
 export interface StationInput {
@@ -44,6 +47,8 @@ export interface StationInput {
   readonly updatedAt?: string;
   readonly updatedBy?: Id | null;
   readonly updatedByName?: string;
+  readonly createdBy?: Id | null;
+  readonly createdByName?: string;
 }
 
 const MAX_NAME = 60;
@@ -101,6 +106,8 @@ export function createStation(input: StationInput): Result<Station> {
     updatedAt: input.updatedAt ?? nowTimestamp(),
     updatedBy: input.updatedBy ?? null,
     updatedByName: input.updatedByName?.trim() ?? '',
+    createdBy: input.createdBy ?? null,
+    createdByName: input.createdByName?.trim() ?? '',
   });
 }
 

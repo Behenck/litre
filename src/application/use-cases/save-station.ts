@@ -35,7 +35,9 @@ export async function saveStation(
   if (!candidate.ok) return candidate;
 
   const existing = await repository.findByNameKey(user.regionKey, candidate.value.nameKey);
-  const station: Station = existing ? { ...candidate.value, id: existing.id } : candidate.value;
+  const station: Station = existing
+    ? { ...candidate.value, id: existing.id, createdBy: existing.createdBy, createdByName: existing.createdByName }
+    : { ...candidate.value, createdBy: user.id, createdByName: user.name };
 
   await repository.save(station);
   await repository.appendPriceHistory(createStationPriceEntry(station));

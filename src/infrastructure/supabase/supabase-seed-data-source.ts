@@ -44,6 +44,8 @@ function stationsFor(user: User): Tables<'stations'>[] {
     updated_at: daysAgo(days),
     updated_by: user.id,
     updated_by_name: user.name,
+    created_by: user.id,
+    created_by_name: user.name,
   }));
 }
 

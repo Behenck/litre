@@ -2,6 +2,7 @@ import { migration001Initial } from './001-initial';
 import { migration002Accounts } from './002-accounts';
 import { migration003StationPriceDate } from './003-station-price-date';
 import { migration004StationPriceHistory } from './004-station-price-history';
+import { migration005StationCreator } from './005-station-creator';
 
 export interface Migration {
   readonly name: string;
@@ -14,4 +15,5 @@ export const MIGRATIONS: readonly Migration[] = [
   migration002Accounts,
   migration003StationPriceDate,
   migration004StationPriceHistory,
+  migration005StationCreator,
 ];

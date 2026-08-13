@@ -11,6 +11,7 @@ import { nowTimestamp } from '../shared/iso-date';
 import { createRegion, type Region } from '../shared/region';
 import { fail, ok, type Result } from '../shared/result';
 import { createEmail } from './email';
+import type { Role } from './role';
 
 export interface User {
   readonly id: Id;
@@ -23,6 +24,8 @@ export interface User {
   readonly regionKey: string;
   /** `null` enquanto o e-mail não foi confirmado; sem isso não há login. */
   readonly emailVerifiedAt: string | null;
+  /** Todo mundo cadastra como membro; admin só se torna quem alguém setar direto no banco. */
+  readonly role: Role;
   readonly createdAt: string;
 }
 
@@ -34,6 +37,7 @@ export interface UserInput {
   readonly city: string;
   readonly state: string;
   readonly emailVerifiedAt?: string | null;
+  readonly role?: Role;
   readonly createdAt?: string;
 }
 
@@ -68,6 +72,7 @@ export function createUser(input: UserInput): Result<User> {
     state: region.value.state,
     regionKey: region.value.key,
     emailVerifiedAt: input.emailVerifiedAt ?? null,
+    role: input.role ?? 'membro',
     createdAt: input.createdAt ?? nowTimestamp(),
   });
 }
