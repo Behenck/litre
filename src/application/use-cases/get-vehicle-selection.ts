@@ -1,4 +1,5 @@
 import type { VehicleRepository } from '../ports/vehicle-repository';
+import type { Id } from '@/domain/shared/id';
 import type { Vehicle } from '@/domain/vehicle/vehicle';
 
 export interface VehicleSelection {
@@ -15,9 +16,10 @@ export interface VehicleSelection {
  */
 export async function getVehicleSelection(
   repository: VehicleRepository,
+  ownerId: Id,
   requestedId: string | undefined,
 ): Promise<VehicleSelection> {
-  const vehicles = await repository.list();
+  const vehicles = await repository.list(ownerId);
   const selected = vehicles.find((vehicle) => vehicle.id === requestedId) ?? vehicles[0] ?? null;
   return { vehicles, selected };
 }

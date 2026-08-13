@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { requireUser } from '@/app/auth/current-user';
 import { getContainer } from '@/infrastructure/container';
 import { PageHeader } from '@/ui/components/PageHeader';
 import { DeleteVehicleButton } from '@/ui/features/vehicles/DeleteVehicleButton';
@@ -13,11 +14,12 @@ interface PageProps {
 export default async function EditVehiclePage({ params }: PageProps) {
   const { id } = await params;
   const { vehicles } = getContainer();
+  const user = await requireUser();
 
-  const vehicle = await vehicles.findById(id);
+  const vehicle = await vehicles.findById(user.id, id);
   if (!vehicle) notFound();
 
-  const fillUpCount = await vehicles.countFillUps(id);
+  const fillUpCount = await vehicles.countFillUps(user.id, id);
 
   return (
     <div className={styles.narrow}>

@@ -11,7 +11,12 @@ export type DomainErrorCode =
   | 'fora-de-faixa'
   | 'data-futura'
   | 'odometro-nao-crescente'
-  | 'nao-encontrado';
+  | 'nao-encontrado'
+  | 'email-em-uso'
+  | 'credenciais-invalidas'
+  | 'email-nao-verificado'
+  | 'link-invalido'
+  | 'nao-autorizado';
 
 export interface DomainError {
   readonly code: DomainErrorCode;

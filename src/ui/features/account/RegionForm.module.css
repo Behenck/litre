@@ -1,0 +1,25 @@
+.form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 80px auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 360px;
+}
+
+.error {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--danger);
+}
+
+@media (max-width: 480px) {
+  .form {
+    grid-template-columns: minmax(0, 1fr) 76px;
+  }
+
+  .form > :nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}

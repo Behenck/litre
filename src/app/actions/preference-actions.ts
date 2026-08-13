@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { requireUser } from '@/app/auth/current-user';
 import { isConsumptionUnit } from '@/domain/shared/consumption-unit';
 import { isTheme } from '@/application/ports/preferences-store';
 import { getContainer } from '@/infrastructure/container';
@@ -42,9 +43,10 @@ export async function toggleUnitAction(): Promise<void> {
   revalidatePath('/', 'layout');
 }
 
-/** Restaura o conjunto de demonstração (FR-036). */
+/** Restaura o conjunto de demonstração na conta de quem pediu (FR-036). */
 export async function resetSeedDataAction(): Promise<void> {
-  await getContainer().seed.reset();
+  const user = await requireUser();
+  await getContainer().seed.reset(user);
   revalidatePath('/', 'layout');
   redirect(`/?ok=${encodeURIComponent('Dados de exemplo restaurados')}`);
 }

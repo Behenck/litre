@@ -1,6 +1,7 @@
 import type { FillUpRepository } from '../ports/fill-up-repository';
 import type { VehicleRepository } from '../ports/vehicle-repository';
 import { createFillUp, type FillUp, type FillUpInput } from '@/domain/fill-up/fill-up';
+import type { Id } from '@/domain/shared/id';
 import { fail, ok, type Result } from '@/domain/shared/result';
 
 /**
@@ -12,9 +13,10 @@ import { fail, ok, type Result } from '@/domain/shared/result';
 export async function registerFillUp(
   fillUps: FillUpRepository,
   vehicles: VehicleRepository,
+  ownerId: Id,
   input: FillUpInput,
 ): Promise<Result<FillUp>> {
-  const vehicle = await vehicles.findById(input.vehicleId);
+  const vehicle = await vehicles.findById(ownerId, input.vehicleId);
   if (!vehicle) {
     return fail('nao-encontrado', 'Selecione um veículo válido.', 'vehicleId');
   }
@@ -22,7 +24,7 @@ export async function registerFillUp(
   const created = createFillUp(input);
   if (!created.ok) return created;
 
-  const previous = await fillUps.findLastByVehicle(input.vehicleId);
+  const previous = await fillUps.findLastByVehicle(ownerId, input.vehicleId);
   if (previous && created.value.odometer <= previous.odometer) {
     return fail(
       'odometro-nao-crescente',
@@ -33,6 +35,6 @@ export async function registerFillUp(
     );
   }
 
-  await fillUps.save(created.value);
+  await fillUps.save(ownerId, created.value);
   return ok(created.value);
 }

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { requireUser } from '@/app/auth/current-user';
 import { deleteVehicle } from '@/application/use-cases/delete-vehicle';
 import { saveVehicle } from '@/application/use-cases/save-vehicle';
 import { getContainer } from '@/infrastructure/container';
@@ -9,8 +10,11 @@ import { type ActionState, toActionState } from './action-state';
 import { decimalOrZero, integer, text } from './form-parsing';
 
 /**
- * Fronteira dos veículos: extrai o formulário, delega ao caso de uso e revalida.
- * Nenhuma regra de negócio mora aqui.
+ * Fronteira dos veículos: confere quem está logado, extrai o formulário, delega
+ * ao caso de uso e revalida. Nenhuma regra de negócio mora aqui.
+ *
+ * O dono vem sempre da sessão, nunca do formulário — campo escondido em HTML é
+ * sugestão do navegador, não prova de identidade.
  */
 
 function readForm(form: FormData) {
@@ -31,7 +35,8 @@ export async function saveVehicleAction(_previous: ActionState, form: FormData):
   const odometer = decimalOrZero(form, 'odometer', 'odometer');
   if (!odometer.ok) return toActionState(odometer.error);
 
-  const result = await saveVehicle(getContainer().vehicles, {
+  const user = await requireUser();
+  const result = await saveVehicle(getContainer().vehicles, user.id, {
     ...readForm(form),
     initialOdometer: odometer.value,
   });
@@ -43,8 +48,8 @@ export async function saveVehicleAction(_previous: ActionState, form: FormData):
 }
 
 export async function deleteVehicleAction(_previous: ActionState, form: FormData): Promise<ActionState> {
-  const id = text(form, 'id');
-  const result = await deleteVehicle(getContainer().vehicles, id);
+  const user = await requireUser();
+  const result = await deleteVehicle(getContainer().vehicles, user.id, text(form, 'id'));
 
   if (!result.ok) return toActionState(result.error);
 

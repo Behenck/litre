@@ -30,8 +30,10 @@ npm run dev             # http://localhost:3000
 | `npm run lint` | ESLint, incluindo as regras de fronteira entre camadas |
 | `npm run typecheck` | `tsc --noEmit` em modo strict |
 | `npm test` | testes das regras de domínio |
-| `npm run db:migrate` | aplica migrações pendentes (idempotente) |
-| `npm run db:seed` | **substitui** os dados atuais pelos de demonstração |
+| `npm run db:migrate` | aplica as migrações do SQLite (idempotente) |
+| `npm run db:seed` | **substitui** os dados do driver ativo pelos de demonstração |
+| `npm run supabase:start` / `supabase:stop` | inicia ou encerra o Supabase local |
+| `npm run supabase:push` | aplica as migrações ao projeto Supabase vinculado |
 
 ## Variáveis de ambiente
 
@@ -39,17 +41,27 @@ npm run dev             # http://localhost:3000
 |----------|---------|--------|
 | `LITRO_DB_DRIVER` | `sqlite` \| `supabase` | `sqlite` |
 | `LITRO_DB_PATH` | caminho do arquivo SQLite | `data/litro.db` |
+| `SUPABASE_URL` | URL da API do projeto | — |
+| `SUPABASE_SECRET_KEY` | secret key exclusiva do servidor | — |
+| `LITRO_JWT_SECRET` | segredo que assina os tokens de sessão (mín. 32 caracteres) | — |
+| `LITRO_APP_URL` | base do link enviado no e-mail de confirmação | `http://localhost:3000` |
+| `RESEND_API_KEY` | chave da API do Resend | — |
+| `LITRO_MAIL_FROM` | remetente do e-mail de confirmação | `Litro <onboarding@resend.dev>` |
 
 ## Funcionalidades
 
+- **Conta** — cadastro com confirmação por e-mail, login com sessão em JWT e cidade/estado do
+  motorista. Veículos e abastecimentos são privados de cada conta.
 - **Veículos** — carros e motos, com marca, modelo, ano, placa, cor e combustível principal.
 - **Abastecimentos** — quilometragem, litros, valor pago, posto e indicação de tanque cheio, com
   preço por litro e distância percorrida calculados enquanto você digita.
 - **Painel** — média de consumo, custo por quilômetro, total gasto e gráfico dos últimos trechos.
 - **Histórico** — todos os lançamentos, com consumo por trecho e exclusão que recalcula tudo.
-- **Postos** — preços de gasolina, etanol e diesel, com destaque para o mais barato.
+- **Postos** — preços de gasolina, etanol e diesel **compartilhados entre os motoristas da mesma
+  cidade**: o que você anota aparece para eles, e o que eles anotam aparece para você. O mais
+  barato ganha destaque.
 - **Etanol × gasolina** — comparativo pelo consumo real do veículo, não só pela regra dos 70%.
-- **Ajustes** — tema claro/escuro e unidade km/L ou L/100km, persistidos por dispositivo.
+- **Ajustes** — cidade da conta, tema claro/escuro e unidade km/L ou L/100km.
 
 ## Arquitetura
 
@@ -82,6 +94,21 @@ As fronteiras entre camadas são verificadas pelo ESLint (`no-restricted-imports
 Toda escrita acontece em Server Actions (`src/app/actions/`), que validam a entrada, chamam o caso
 de uso e revalidam os caminhos afetados. O cliente nunca fala com o banco.
 
+### Autenticação
+
+- **Senha** — hash scrypt com sal por senha (`node:crypto`), comparação em tempo constante.
+- **Sessão** — JWT HS256 assinado com `LITRO_JWT_SECRET`, guardado em cookie `httpOnly` e
+  registrado na tabela `sessions`. O token só vale enquanto a linha existir: sair da conta apaga a
+  linha e o JWT morre na hora, mesmo dentro da validade. O banco guarda o SHA-256 do token, não o
+  token.
+- **Confirmação de e-mail** — token aleatório de 32 bytes enviado pelo Resend; o banco guarda só o
+  hash. Vale 24 horas e só uma vez. Sem confirmar, não há login.
+- **Escopo dos dados** — `user_id` entra em toda consulta de veículo e abastecimento, dentro do
+  repositório. Postos são o único dado coletivo, escopado por `region_key` (`UF:cidade`).
+
+Contas, sessões e confirmação de e-mail existem **apenas no driver `supabase`**; no driver
+`sqlite` os adaptadores de conta falham com uma mensagem explícita.
+
 ## Testes
 
 ```bash
@@ -92,18 +119,31 @@ Cobrem as regras que não podem errar: conversão de números em pt-BR, invarian
 cálculo de trechos, média ponderada, custo por km, tendência, conversão de unidade e comparativo de
 combustíveis.
 
-## Migrando para o Supabase
+## Usando Supabase
 
-O projeto já está preparado para a troca — ids gerados no domínio, portas assíncronas, valores
-monetários em centavos inteiros e datas em `YYYY-MM-DD`:
+O adaptador Supabase implementa as mesmas portas do SQLite. O acesso acontece somente nos Server
+Components e Server Actions, com uma secret key que nunca deve receber o prefixo `NEXT_PUBLIC_`.
+As tabelas têm RLS habilitado e não concedem acesso aos papéis `anon` ou `authenticated`.
 
-1. Crie `src/infrastructure/supabase/` implementando as mesmas interfaces de
-   `src/application/ports/`.
-2. Traduza `src/infrastructure/sqlite/migrations/` para Postgres (os tipos usados têm equivalente
-   direto; `full_tank` vira `boolean` no mapeador).
-3. Registre o driver em `src/infrastructure/container.ts` e defina `LITRO_DB_DRIVER=supabase`.
+Para conectar um projeto remoto:
 
-Nenhum arquivo de `domain/`, `application/`, `ui/` ou `app/` precisa mudar.
+```bash
+npx supabase login
+npx supabase link --project-ref SEU_PROJECT_REF
+npm run supabase:push
+```
+
+Depois, copie `.env.example` para `.env.local`, use `LITRO_DB_DRIVER=supabase` e preencha
+`SUPABASE_URL` e `SUPABASE_SECRET_KEY` com os valores exibidos em **Connect** no Dashboard. Para
+carregar o conjunto de demonstração no projeto conectado:
+
+```bash
+npm run db:seed
+```
+
+O login é próprio (tabelas `users`, `sessions` e `email_verifications`), não o Supabase Auth: o
+app fala com o banco só pelo servidor, com a secret key, e o navegador nunca alcança o Postgres.
+Por isso as tabelas de conta também têm RLS habilitado e negam `anon` e `authenticated`.
 
 ## Documentação do projeto
 

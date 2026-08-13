@@ -1,3 +1,4 @@
+import { requireUser } from '@/app/auth/current-user';
 import { getVehicleSelection } from '@/application/use-cases/get-vehicle-selection';
 import { today } from '@/domain/shared/iso-date';
 import { getContainer } from '@/infrastructure/container';
@@ -14,8 +15,9 @@ interface PageProps {
 export default async function RefuelPage({ searchParams }: PageProps) {
   const { veiculo } = await searchParams;
   const { vehicles, fillUps } = getContainer();
+  const user = await requireUser();
 
-  const { vehicles: all, selected } = await getVehicleSelection(vehicles, veiculo);
+  const { vehicles: all, selected } = await getVehicleSelection(vehicles, user.id, veiculo);
 
   if (!selected) {
     return (
@@ -31,13 +33,13 @@ export default async function RefuelPage({ searchParams }: PageProps) {
   const lastOdometers: Record<string, number> = {};
   await Promise.all(
     all.map(async (vehicle) => {
-      const last = await fillUps.findLastByVehicle(vehicle.id);
+      const last = await fillUps.findLastByVehicle(user.id, vehicle.id);
       const odometer = last?.odometer ?? vehicle.initialOdometer;
       if (odometer > 0) lastOdometers[vehicle.id] = odometer;
     }),
   );
 
-  const stationNames = await fillUps.listStationNames();
+  const stationNames = await fillUps.listStationNames(user.id);
 
   return (
     <div className={styles.narrow}>

@@ -1,3 +1,4 @@
+import { requireUser } from '@/app/auth/current-user';
 import { listVehicles } from '@/application/use-cases/list-vehicles';
 import { getContainer } from '@/infrastructure/container';
 import { ButtonLink } from '@/ui/components/PrimaryButton';
@@ -14,8 +15,9 @@ interface PageProps {
 export default async function VehiclesPage({ searchParams }: PageProps) {
   const { ok } = await searchParams;
   const { vehicles, fillUps, preferences } = getContainer();
+  const user = await requireUser();
 
-  const [summaries, { unit }] = await Promise.all([listVehicles(vehicles, fillUps), preferences.read()]);
+  const [summaries, { unit }] = await Promise.all([listVehicles(vehicles, fillUps, user.id), preferences.read()]);
 
   return (
     <>

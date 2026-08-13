@@ -1,3 +1,4 @@
+import { requireUser } from '@/app/auth/current-user';
 import { getVehicleDashboard } from '@/application/use-cases/get-vehicle-dashboard';
 import { getVehicleSelection } from '@/application/use-cases/get-vehicle-selection';
 import { legForFillUp } from '@/domain/analytics/vehicle-stats';
@@ -18,9 +19,10 @@ interface PageProps {
 export default async function HistoryPage({ searchParams }: PageProps) {
   const { veiculo, ok } = await searchParams;
   const { vehicles, fillUps, preferences } = getContainer();
+  const user = await requireUser();
 
   const [{ vehicles: all, selected }, { unit }] = await Promise.all([
-    getVehicleSelection(vehicles, veiculo),
+    getVehicleSelection(vehicles, user.id, veiculo),
     preferences.read(),
   ]);
 
@@ -35,7 +37,7 @@ export default async function HistoryPage({ searchParams }: PageProps) {
   }
 
   // `all` já vem do mais recente para o mais antigo (FR-012).
-  const { stats, all: history } = await getVehicleDashboard(fillUps, selected.id);
+  const { stats, all: history } = await getVehicleDashboard(fillUps, user.id, selected.id);
 
   return (
     <>

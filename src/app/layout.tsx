@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { currentUser } from '@/app/auth/current-user';
 import { getContainer } from '@/infrastructure/container';
 import { AppHeader } from '@/ui/components/AppHeader';
 import '@/ui/styles/globals.css';
@@ -39,9 +40,12 @@ export const viewport: Viewport = {
 /**
  * O tema e a unidade são lidos do cookie no servidor e escritos no <html>.
  * Por isso a primeira pintura já sai correta — sem script bloqueante e sem flash.
+ *
+ * O cabeçalho com as abas só existe para quem entrou: nas telas de conta não há
+ * para onde navegar, e mostrar a navegação ali só confundiria.
  */
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const { theme, unit } = await getContainer().preferences.read();
+  const [{ theme, unit }, user] = await Promise.all([getContainer().preferences.read(), currentUser()]);
 
   return (
     <html
@@ -54,8 +58,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <a href="#conteudo" className={styles.skipLink}>
           Ir para o conteúdo
         </a>
-        <AppHeader theme={theme} />
-        <main id="conteudo" className={styles.main}>
+        {user ? <AppHeader theme={theme} user={user} /> : null}
+        <main id="conteudo" className={user ? styles.main : undefined}>
           {children}
         </main>
       </body>

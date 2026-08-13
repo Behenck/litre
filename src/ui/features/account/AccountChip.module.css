@@ -1,0 +1,49 @@
+.chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.identity {
+  display: none;
+  flex-direction: column;
+  line-height: 1.15;
+  text-align: right;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.region {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.signOut {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.signOut:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+@media (min-width: 560px) {
+  .identity {
+    display: flex;
+  }
+}

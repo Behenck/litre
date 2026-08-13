@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { requireUser } from '@/app/auth/current-user';
 import { deleteFillUp } from '@/application/use-cases/delete-fill-up';
 import { registerFillUp } from '@/application/use-cases/register-fill-up';
 import { getContainer } from '@/infrastructure/container';
@@ -20,8 +21,9 @@ export async function createFillUpAction(_previous: ActionState, form: FormData)
 
   const vehicleId = text(form, 'vehicleId');
   const { fillUps, vehicles } = getContainer();
+  const user = await requireUser();
 
-  const result = await registerFillUp(fillUps, vehicles, {
+  const result = await registerFillUp(fillUps, vehicles, user.id, {
     vehicleId,
     date: text(form, 'date'),
     odometer: odometer.value,
@@ -42,7 +44,8 @@ export async function deleteFillUpAction(_previous: ActionState, form: FormData)
   const id = text(form, 'id');
   const vehicleId = text(form, 'vehicleId');
 
-  const result = await deleteFillUp(getContainer().fillUps, id);
+  const user = await requireUser();
+  const result = await deleteFillUp(getContainer().fillUps, user.id, id);
   if (!result.ok) return toActionState(result.error);
 
   revalidatePath('/', 'layout');

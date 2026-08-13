@@ -1,6 +1,7 @@
 import type { FillUpRepository } from '../ports/fill-up-repository';
 import type { VehicleRepository } from '../ports/vehicle-repository';
 import { averageKmPerLiter } from '@/domain/analytics/consumption';
+import type { Id } from '@/domain/shared/id';
 import type { Vehicle } from '@/domain/vehicle/vehicle';
 
 /** Veículo já acompanhado do que a lista precisa mostrar. */
@@ -20,12 +21,13 @@ export interface VehicleSummary {
 export async function listVehicles(
   vehicles: VehicleRepository,
   fillUps: FillUpRepository,
+  ownerId: Id,
 ): Promise<VehicleSummary[]> {
-  const all = await vehicles.list();
+  const all = await vehicles.list(ownerId);
 
   return Promise.all(
     all.map(async (vehicle) => {
-      const vehicleFillUps = await fillUps.listByVehicle(vehicle.id);
+      const vehicleFillUps = await fillUps.listByVehicle(ownerId, vehicle.id);
       const last = vehicleFillUps.at(-1);
 
       return {

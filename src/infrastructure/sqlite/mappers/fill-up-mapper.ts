@@ -1,4 +1,5 @@
 import type { FillUp } from '@/domain/fill-up/fill-up';
+import type { Id } from '@/domain/shared/id';
 import type { FuelType } from '@/domain/vehicle/fuel-type';
 
 /**
@@ -8,6 +9,7 @@ import type { FuelType } from '@/domain/vehicle/fuel-type';
 
 export interface FillUpRow {
   id: string;
+  user_id: string;
   vehicle_id: string;
   date: string;
   odometer: number;
@@ -34,9 +36,10 @@ export function rowToFillUp(row: FillUpRow): FillUp {
   };
 }
 
-export function fillUpToRow(fillUp: FillUp): FillUpRow {
+export function fillUpToRow(ownerId: Id, fillUp: FillUp): FillUpRow {
   return {
     id: fillUp.id,
+    user_id: ownerId,
     vehicle_id: fillUp.vehicleId,
     date: fillUp.date,
     odometer: fillUp.odometer,

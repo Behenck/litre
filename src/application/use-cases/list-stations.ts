@@ -7,7 +7,8 @@ export interface StationList {
   readonly cheapestId: string | null;
 }
 
-export async function listStations(repository: StationRepository): Promise<StationList> {
-  const stations = await repository.list();
+/** Postos da praça do motorista — os dele e os anotados por outros da cidade. */
+export async function listStations(repository: StationRepository, regionKey: string): Promise<StationList> {
+  const stations = await repository.list(regionKey);
   return { stations, cheapestId: cheapestGasolineStationId(stations) };
 }

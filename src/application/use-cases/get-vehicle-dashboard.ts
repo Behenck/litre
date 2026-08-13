@@ -16,10 +16,11 @@ export interface VehicleDashboard {
  */
 export async function getVehicleDashboard(
   repository: FillUpRepository,
+  ownerId: Id,
   vehicleId: Id,
   recentLimit = 4,
 ): Promise<VehicleDashboard> {
-  const all = await repository.listByVehicle(vehicleId);
+  const all = await repository.listByVehicle(ownerId, vehicleId);
   const newestFirst = [...all].reverse();
 
   return {

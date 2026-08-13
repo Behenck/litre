@@ -8,10 +8,15 @@ function station(id: string, gasolinePrice: number | null): Station {
     id,
     name: `Posto ${id}`,
     nameKey: `posto ${id}`,
+    city: 'Curitiba',
+    state: 'PR',
+    regionKey: 'PR:curitiba',
     gasolinePrice,
     ethanolPrice: null,
     dieselPrice: null,
     updatedAt: '2026-08-13T10:00:00.000Z',
+    updatedBy: null,
+    updatedByName: '',
   };
 }
 
@@ -27,6 +32,8 @@ describe('createStation', () => {
   it('cria um posto com os três preços', () => {
     const result = createStation({
       name: 'Shell Av. Brasil',
+      city: 'Curitiba',
+      state: 'PR',
       gasolinePrice: 629,
       ethanolPrice: 419,
       dieselPrice: 589,
@@ -42,6 +49,8 @@ describe('createStation', () => {
   it('aceita posto sem preços informados', () => {
     const result = createStation({
       name: 'Posto novo',
+      city: 'Curitiba',
+      state: 'PR',
       gasolinePrice: null,
       ethanolPrice: null,
       dieselPrice: null,
@@ -50,13 +59,65 @@ describe('createStation', () => {
   });
 
   it('exige o nome', () => {
-    const result = createStation({ name: '  ', gasolinePrice: 629, ethanolPrice: null, dieselPrice: null });
+    const result = createStation({
+      name: '  ',
+      city: 'Curitiba',
+      state: 'PR',
+      gasolinePrice: 629,
+      ethanolPrice: null,
+      dieselPrice: null,
+    });
     assert.equal(result.ok, false);
     if (!result.ok) assert.equal(result.error.field, 'name');
   });
 
+  it('separa postos de mesmo nome em cidades diferentes', () => {
+    const curitiba = createStation({
+      name: 'Ipiranga Centro',
+      city: 'Curitiba',
+      state: 'PR',
+      gasolinePrice: 619,
+      ethanolPrice: null,
+      dieselPrice: null,
+    });
+    const joinville = createStation({
+      name: 'Ipiranga Centro',
+      city: 'Joinville',
+      state: 'SC',
+      gasolinePrice: 609,
+      ethanolPrice: null,
+      dieselPrice: null,
+    });
+
+    assert.equal(curitiba.ok && joinville.ok, true);
+    if (curitiba.ok && joinville.ok) {
+      assert.equal(curitiba.value.nameKey, joinville.value.nameKey);
+      assert.notEqual(curitiba.value.regionKey, joinville.value.regionKey);
+    }
+  });
+
+  it('exige um estado válido', () => {
+    const result = createStation({
+      name: 'Posto',
+      city: 'Curitiba',
+      state: 'XX',
+      gasolinePrice: 619,
+      ethanolPrice: null,
+      dieselPrice: null,
+    });
+    assert.equal(result.ok, false);
+    if (!result.ok) assert.equal(result.error.field, 'state');
+  });
+
   it('recusa preço zerado ou negativo', () => {
-    const result = createStation({ name: 'Posto', gasolinePrice: 0, ethanolPrice: null, dieselPrice: null });
+    const result = createStation({
+      name: 'Posto',
+      city: 'Curitiba',
+      state: 'PR',
+      gasolinePrice: 0,
+      ethanolPrice: null,
+      dieselPrice: null,
+    });
     assert.equal(result.ok, false);
     if (!result.ok) assert.equal(result.error.field, 'gasoline');
   });

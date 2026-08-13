@@ -8,7 +8,7 @@ import nextTypescript from 'eslint-config-next/typescript';
  */
 const config = [
   {
-    ignores: ['.next/**', 'node_modules/**', 'design-model/**', 'data/**', 'Litro.html'],
+    ignores: ['.next/**', 'node_modules/**', 'design-model/**', 'data/**', 'supabase/.temp/**', 'Litro.html'],
   },
   ...coreWebVitals,
   ...nextTypescript,
@@ -68,7 +68,13 @@ const config = [
               message: 'A UI nunca fala com o banco diretamente (Princípio IV).',
             },
             {
-              group: ['@/infrastructure/sqlite/*', '@/infrastructure/preferences/*'],
+              group: [
+                '@/infrastructure/sqlite/*',
+                '@/infrastructure/supabase/*',
+                '@/infrastructure/preferences/*',
+                '@/infrastructure/auth/*',
+                '@/infrastructure/mail/*',
+              ],
               message: 'Use o container ou os casos de uso, não o adaptador concreto (Princípio II - DIP).',
             },
           ],

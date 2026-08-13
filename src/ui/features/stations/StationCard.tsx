@@ -8,21 +8,27 @@ interface StationCardProps {
   station: Station;
   /** Recebe o selo de destaque (FR-027). */
   cheapest: boolean;
+  /** Quem anotou o preço por último pode remover o posto; os demais só corrigem. */
+  mine: boolean;
 }
 
-export function StationCard({ station, cheapest }: StationCardProps) {
+export function StationCard({ station, cheapest, mine }: StationCardProps) {
   const prices = [
     { label: 'Gasolina', value: station.gasolinePrice },
     { label: 'Etanol', value: station.ethanolPrice },
     { label: 'Diesel', value: station.dieselPrice },
   ];
 
+  const credit = mine ? 'você' : station.updatedByName || 'outro motorista';
+
   return (
     <article className={styles.card}>
       <header className={styles.header}>
         <div className={styles.identity}>
           <h3 className={styles.name}>{station.name}</h3>
-          <p className={styles.updated}>Atualizado {formatRelative(station.updatedAt)}</p>
+          <p className={styles.updated}>
+            Atualizado {formatRelative(station.updatedAt)} por {credit}
+          </p>
         </div>
         {cheapest ? <span className={styles.badge}>mais barato</span> : null}
       </header>
@@ -36,7 +42,7 @@ export function StationCard({ station, cheapest }: StationCardProps) {
         ))}
       </dl>
 
-      <DeleteStationButton stationId={station.id} stationName={station.name} />
+      {mine ? <DeleteStationButton stationId={station.id} stationName={station.name} /> : null}
     </article>
   );
 }

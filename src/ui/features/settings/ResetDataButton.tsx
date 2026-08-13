@@ -10,7 +10,8 @@ import { SubmitButton } from '@/ui/components/SubmitButton';
  */
 export function ResetDataButton() {
   function confirmReset(event: React.FormEvent<HTMLFormElement>) {
-    const message = 'Isso apaga seus veículos, abastecimentos e postos e recarrega os dados de exemplo. Continuar?';
+    const message =
+      'Isso apaga seus veículos e abastecimentos e recarrega os dados de exemplo. Os postos da sua cidade não são apagados. Continuar?';
     if (!window.confirm(message)) event.preventDefault();
   }
 

@@ -6,15 +6,17 @@ import { getDatabase } from './connection';
 import { ensureSchema } from './migrate';
 import { fillUpToRow, type FillUpRow, rowToFillUp } from './mappers/fill-up-mapper';
 
-const COLUMNS = 'id, vehicle_id, date, odometer, liters, total_cents, fuel, station_name, full_tank, created_at';
+const COLUMNS =
+  'id, user_id, vehicle_id, date, odometer, liters, total_cents, fuel, station_name, full_tank, created_at';
 
 const UPSERT = `
   INSERT INTO fill_ups (${COLUMNS})
-  VALUES (@id, @vehicle_id, @date, @odometer, @liters, @total_cents, @fuel, @station_name, @full_tank, @created_at)
+  VALUES (@id, @user_id, @vehicle_id, @date, @odometer, @liters, @total_cents, @fuel, @station_name, @full_tank, @created_at)
   ON CONFLICT(id) DO UPDATE SET
     vehicle_id = excluded.vehicle_id, date = excluded.date, odometer = excluded.odometer,
     liters = excluded.liters, total_cents = excluded.total_cents, fuel = excluded.fuel,
     station_name = excluded.station_name, full_tank = excluded.full_tank
+  WHERE fill_ups.user_id = excluded.user_id
 `;
 
 export class SqliteFillUpRepository implements FillUpRepository {
@@ -22,60 +24,64 @@ export class SqliteFillUpRepository implements FillUpRepository {
     ensureSchema();
   }
 
-  async listByVehicle(vehicleId: Id): Promise<FillUp[]> {
+  async listByVehicle(ownerId: Id, vehicleId: Id): Promise<FillUp[]> {
     try {
       const rows = getDatabase()
-        .prepare(`SELECT ${COLUMNS} FROM fill_ups WHERE vehicle_id = ? ORDER BY odometer ASC, date ASC`)
-        .all(vehicleId) as FillUpRow[];
+        .prepare(
+          `SELECT ${COLUMNS} FROM fill_ups WHERE user_id = ? AND vehicle_id = ? ORDER BY odometer ASC, date ASC`,
+        )
+        .all(ownerId, vehicleId) as FillUpRow[];
       return rows.map(rowToFillUp);
     } catch (cause) {
       throw new RepositoryError('Falha ao listar os abastecimentos.', cause);
     }
   }
 
-  async findLastByVehicle(vehicleId: Id): Promise<FillUp | null> {
+  async findLastByVehicle(ownerId: Id, vehicleId: Id): Promise<FillUp | null> {
     try {
       const row = getDatabase()
-        .prepare(`SELECT ${COLUMNS} FROM fill_ups WHERE vehicle_id = ? ORDER BY odometer DESC LIMIT 1`)
-        .get(vehicleId) as FillUpRow | undefined;
+        .prepare(`SELECT ${COLUMNS} FROM fill_ups WHERE user_id = ? AND vehicle_id = ? ORDER BY odometer DESC LIMIT 1`)
+        .get(ownerId, vehicleId) as FillUpRow | undefined;
       return row ? rowToFillUp(row) : null;
     } catch (cause) {
       throw new RepositoryError('Falha ao buscar o último abastecimento.', cause);
     }
   }
 
-  async findById(id: Id): Promise<FillUp | null> {
+  async findById(ownerId: Id, id: Id): Promise<FillUp | null> {
     try {
-      const row = getDatabase().prepare(`SELECT ${COLUMNS} FROM fill_ups WHERE id = ?`).get(id) as
-        | FillUpRow
-        | undefined;
+      const row = getDatabase()
+        .prepare(`SELECT ${COLUMNS} FROM fill_ups WHERE user_id = ? AND id = ?`)
+        .get(ownerId, id) as FillUpRow | undefined;
       return row ? rowToFillUp(row) : null;
     } catch (cause) {
       throw new RepositoryError('Falha ao buscar o abastecimento.', cause);
     }
   }
 
-  async save(fillUp: FillUp): Promise<void> {
+  async save(ownerId: Id, fillUp: FillUp): Promise<void> {
     try {
-      getDatabase().prepare(UPSERT).run(fillUpToRow(fillUp));
+      getDatabase().prepare(UPSERT).run(fillUpToRow(ownerId, fillUp));
     } catch (cause) {
       throw new RepositoryError('Falha ao salvar o abastecimento.', cause);
     }
   }
 
-  async delete(id: Id): Promise<void> {
+  async delete(ownerId: Id, id: Id): Promise<void> {
     try {
-      getDatabase().prepare('DELETE FROM fill_ups WHERE id = ?').run(id);
+      getDatabase().prepare('DELETE FROM fill_ups WHERE user_id = ? AND id = ?').run(ownerId, id);
     } catch (cause) {
       throw new RepositoryError('Falha ao excluir o abastecimento.', cause);
     }
   }
 
-  async listStationNames(): Promise<string[]> {
+  async listStationNames(ownerId: Id): Promise<string[]> {
     try {
       const rows = getDatabase()
-        .prepare("SELECT DISTINCT station_name FROM fill_ups WHERE station_name <> '' ORDER BY station_name ASC")
-        .all() as { station_name: string }[];
+        .prepare(
+          "SELECT DISTINCT station_name FROM fill_ups WHERE user_id = ? AND station_name <> '' ORDER BY station_name ASC",
+        )
+        .all(ownerId) as { station_name: string }[];
       return rows.map((row) => row.station_name);
     } catch (cause) {
       throw new RepositoryError('Falha ao listar os postos usados.', cause);

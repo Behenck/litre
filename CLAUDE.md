@@ -24,7 +24,10 @@ Antes de considerar uma tarefa pronta: `npm run typecheck && npm run lint && npm
 | regra de cálculo (consumo, custo, comparativo) | `src/domain/analytics/` |
 | validação de um dado ao criar/editar | a fábrica da entidade em `src/domain/<agregado>/` |
 | orquestração (buscar, validar entre agregados, salvar) | `src/application/use-cases/` (um caso por arquivo) |
-| acesso a banco | `src/infrastructure/sqlite/` — e só aí |
+| acesso a banco | `src/infrastructure/sqlite/` e `src/infrastructure/supabase/` — e só aí |
+| regra de conta (e-mail, senha, sessão) | `src/domain/account/` |
+| cidade/estado do motorista | `src/domain/shared/region.ts` |
+| JWT, hash de senha, cookie de sessão, e-mail | `src/infrastructure/auth/` e `src/infrastructure/mail/` |
 | leitura de formulário e revalidação | `src/app/actions/` |
 | tela | `src/app/<rota>/page.tsx`, compondo blocos de `src/ui/features/` |
 | componente reutilizável | `src/ui/components/` |
@@ -35,7 +38,8 @@ Antes de considerar uma tarefa pronta: `npm run typecheck && npm run lint && npm
 
 - `src/domain/**` não importa React, Next, driver de banco nem outras camadas.
 - `src/application/**` importa apenas `domain/` e as próprias portas.
-- `src/ui/**` e `src/app/**` não importam `better-sqlite3` nem adaptadores concretos — usam
+- `src/ui/**` e `src/app/**` não importam `better-sqlite3`, `@supabase/*` nem adaptadores
+  concretos (`infrastructure/sqlite`, `supabase`, `auth`, `mail`, `preferences`) — usam
   `getContainer()`.
 
 Se precisar burlar alguma dessas regras, o desenho está errado.
@@ -55,6 +59,7 @@ Se precisar burlar alguma dessas regras, o desenho está errado.
 ## Ao adicionar…
 
 - **um combustível**: acrescente uma entrada em `src/domain/vehicle/fuel-type.ts`. Nada mais.
+- **uma página nova**: chame `requireUser()` no topo — página sem isso é página aberta.
 - **uma unidade de consumo**: `src/domain/shared/consumption-unit.ts`.
 - **uma coluna ou tabela**: nova migração em `src/infrastructure/sqlite/migrations/`, registrada no
   `index.ts` — nunca edite uma migração já aplicada.
@@ -62,7 +67,14 @@ Se precisar burlar alguma dessas regras, o desenho está errado.
 
 ## Cuidados
 
-- `npm run db:seed` e o botão "Restaurar" em Ajustes **apagam** os dados existentes.
+- `npm run db:seed` e o botão "Restaurar" em Ajustes **apagam** os veículos e abastecimentos da
+  conta (os postos da cidade, não).
+- **O dono vem sempre da sessão** (`requireUser()`), nunca do formulário. O filtro por `user_id`
+  mora dentro do repositório, não na camada de cima.
+- Login, cadastro e confirmação de e-mail só funcionam com `LITRO_DB_DRIVER=supabase`.
+- O posto é o único dado coletivo: quem dirige na mesma cidade (`regionKey` = `UF:cidade`) lê e
+  corrige os mesmos preços. Só quem anotou por último pode remover.
+- Trocar `LITRO_JWT_SECRET` derruba todas as sessões abertas.
 - O odômetro crescente é validado no caso de uso (`register-fill-up`), não na entidade — ele
   depende do abastecimento anterior.
 - A média é ponderada (Σ km ÷ Σ litros), nunca a média aritmética dos consumos.

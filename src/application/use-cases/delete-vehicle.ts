@@ -8,14 +8,18 @@ export interface DeletedVehicle {
   readonly removedFillUps: number;
 }
 
-export async function deleteVehicle(repository: VehicleRepository, id: Id): Promise<Result<DeletedVehicle>> {
-  const vehicle = await repository.findById(id);
+export async function deleteVehicle(
+  repository: VehicleRepository,
+  ownerId: Id,
+  id: Id,
+): Promise<Result<DeletedVehicle>> {
+  const vehicle = await repository.findById(ownerId, id);
   if (!vehicle) {
     return fail('nao-encontrado', 'Veículo não encontrado.');
   }
 
-  const removedFillUps = await repository.countFillUps(id);
-  await repository.delete(id);
+  const removedFillUps = await repository.countFillUps(ownerId, id);
+  await repository.delete(ownerId, id);
 
   return ok({ name: vehicle.model, removedFillUps });
 }

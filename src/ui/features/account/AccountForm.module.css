@@ -1,0 +1,59 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 96px;
+  gap: var(--space-3);
+}
+
+.select {
+  height: var(--control-height);
+  width: 100%;
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--fg);
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.select:focus {
+  border-color: var(--accent);
+}
+
+.select[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.alert {
+  display: block;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--danger);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  color: var(--danger);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.notice {
+  display: block;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: var(--soft);
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.submit {
+  margin-top: var(--space-1);
+}

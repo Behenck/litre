@@ -1,10 +1,13 @@
+import type { User } from '@/domain/account/user';
+
 /**
  * Porta de dados de demonstração.
  *
- * Existe como porta (e não como import direto do adaptador) para que a UI não
- * conheça o driver: a versão Supabase implementará a mesma interface.
+ * Escopada no motorista: restaurar recarrega os veículos e abastecimentos de
+ * quem pediu, e os postos de exemplo na cidade dele — nunca mexe na conta
+ * alheia.
  */
 export interface SeedDataSource {
-  /** Limpa os dados atuais e recarrega o conjunto de demonstração. */
-  reset(): Promise<void>;
+  /** Limpa os dados do usuário e recarrega o conjunto de demonstração. */
+  reset(user: User): Promise<void>;
 }

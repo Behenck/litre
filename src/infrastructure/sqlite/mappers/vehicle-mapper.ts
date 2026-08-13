@@ -1,3 +1,4 @@
+import type { Id } from '@/domain/shared/id';
 import type { FuelType } from '@/domain/vehicle/fuel-type';
 import type { Vehicle, VehicleType } from '@/domain/vehicle/vehicle';
 
@@ -10,6 +11,7 @@ import type { Vehicle, VehicleType } from '@/domain/vehicle/vehicle';
 
 export interface VehicleRow {
   id: string;
+  user_id: string;
   type: string;
   brand: string;
   model: string;
@@ -40,9 +42,10 @@ export function rowToVehicle(row: VehicleRow): Vehicle {
   };
 }
 
-export function vehicleToRow(vehicle: Vehicle): VehicleRow {
+export function vehicleToRow(ownerId: Id, vehicle: Vehicle): VehicleRow {
   return {
     id: vehicle.id,
+    user_id: ownerId,
     type: vehicle.type,
     brand: vehicle.brand,
     model: vehicle.model,
