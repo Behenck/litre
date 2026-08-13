@@ -1,4 +1,4 @@
-# Implementation Plan: Litro — Controle de Abastecimento e Média de Consumo
+# Implementation Plan: Litre — Controle de Abastecimento e Média de Consumo
 
 **Branch**: `001-controle-abastecimento` | **Date**: 2026-08-13 | **Spec**: [spec.md](./spec.md)
 

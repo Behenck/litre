@@ -6,7 +6,7 @@ import { Toast } from '@/ui/components/Toast';
 import { AuthShell } from '@/ui/features/account/AuthShell';
 import { SignInForm } from '@/ui/features/account/SignInForm';
 
-export const metadata: Metadata = { title: 'Entrar — Litro' };
+export const metadata: Metadata = { title: 'Entrar — Litre' };
 
 interface PageProps {
   searchParams: Promise<{ ok?: string }>;

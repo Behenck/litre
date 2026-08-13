@@ -1,4 +1,4 @@
-# Feature Specification: Litro — Controle de Abastecimento e Média de Consumo
+# Feature Specification: Litre — Controle de Abastecimento e Média de Consumo
 
 **Feature Branch**: `001-controle-abastecimento`
 

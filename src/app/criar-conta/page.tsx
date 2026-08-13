@@ -5,7 +5,7 @@ import { currentUser } from '@/app/auth/current-user';
 import { AuthShell } from '@/ui/features/account/AuthShell';
 import { SignUpForm } from '@/ui/features/account/SignUpForm';
 
-export const metadata: Metadata = { title: 'Criar conta — Litro' };
+export const metadata: Metadata = { title: 'Criar conta — Litre' };
 
 export default async function SignUpPage() {
   if (await currentUser()) redirect('/');

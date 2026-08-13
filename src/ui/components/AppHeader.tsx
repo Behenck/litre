@@ -20,7 +20,7 @@ export function AppHeader({ theme, user }: AppHeaderProps) {
             L
           </span>
           <span className={styles.names}>
-            <span className={styles.name}>Litro</span>
+            <span className={styles.name}>Litre</span>
             <span className={styles.tagline}>média de consumo</span>
           </span>
         </Link>

@@ -22,9 +22,9 @@ Removed sections: none
 Deferred TODOs: none
 -->
 
-# Litro Constitution
+# Litre Constitution
 
-Litro é um aplicativo web de controle de abastecimentos, média de consumo e comparativo de
+Litre é um aplicativo web de controle de abastecimentos, média de consumo e comparativo de
 combustíveis. Esta constituição define as regras não negociáveis que qualquer especificação,
 plano ou implementação do projeto MUST respeitar.
 

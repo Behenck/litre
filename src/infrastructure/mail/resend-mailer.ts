@@ -12,7 +12,7 @@ import { verificationEmail } from './verification-email';
 
 const ENDPOINT = 'https://api.resend.com/emails';
 /** Remetente de teste do Resend: entrega só para o dono da conta até verificar um domínio. */
-const DEFAULT_FROM = 'Litro <onboarding@resend.dev>';
+const DEFAULT_FROM = 'Litre <onboarding@resend.dev>';
 
 /** Falha de envio é de infraestrutura, como `RepositoryError` — a UI traduz para o motorista. */
 export class MailError extends Error {

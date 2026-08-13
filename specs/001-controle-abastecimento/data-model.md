@@ -1,4 +1,4 @@
-# Phase 1 — Data Model: Litro
+# Phase 1 — Data Model: Litre
 
 **Date**: 2026-08-13 | **Plan**: [plan.md](./plan.md)
 

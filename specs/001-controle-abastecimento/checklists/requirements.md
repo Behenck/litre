@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Litro — Controle de Abastecimento e Média de Consumo
+# Specification Quality Checklist: Litre — Controle de Abastecimento e Média de Consumo
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-08-13

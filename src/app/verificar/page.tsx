@@ -5,7 +5,7 @@ import { getContainer } from '@/infrastructure/container';
 import { ButtonLink } from '@/ui/components/PrimaryButton';
 import { AuthShell } from '@/ui/features/account/AuthShell';
 
-export const metadata: Metadata = { title: 'Confirmação de e-mail — Litro' };
+export const metadata: Metadata = { title: 'Confirmação de e-mail — Litre' };
 
 interface PageProps {
   searchParams: Promise<{ token?: string }>;
@@ -47,7 +47,7 @@ export default async function VerifyPage({ searchParams }: PageProps) {
       description={`Tudo certo, ${result.value.name.split(' ')[0]}. Sua conta está liberada — é só entrar.`}
     >
       <ButtonLink href="/entrar" full>
-        Entrar no Litro
+        Entrar no Litre
       </ButtonLink>
     </AuthShell>
   );

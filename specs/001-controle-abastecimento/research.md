@@ -1,4 +1,4 @@
-# Phase 0 — Research: Litro
+# Phase 0 — Research: Litre
 
 **Date**: 2026-08-13 | **Plan**: [plan.md](./plan.md)
 

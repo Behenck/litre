@@ -26,7 +26,7 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Litro — média de consumo',
+  title: 'Litre — média de consumo',
   description: 'Controle de abastecimento, média de consumo e custo por quilômetro dos seus veículos.',
 };
 

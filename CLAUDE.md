@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Convenções operacionais do repositório Litro. As regras de governança estão em
+Convenções operacionais do repositório Litre. As regras de governança estão em
 `.specify/memory/constitution.md` e prevalecem sobre este arquivo.
 
 ## Comandos

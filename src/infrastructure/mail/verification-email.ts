@@ -52,11 +52,11 @@ export function verificationEmail(message: VerificationMessage): EmailBody {
   const text = [
     `Confirme seu e-mail, ${message.name.split(' ')[0] ?? ''}`,
     '',
-    'Falta um passo para começar a usar o Litro. Abra o link abaixo para confirmar seu e-mail:',
+    'Falta um passo para começar a usar o Litre. Abra o link abaixo para confirmar seu e-mail:',
     message.link,
     '',
     'O link vale por 24 horas. Não foi você quem criou a conta? É só ignorar este e-mail.',
   ].join('\n');
 
-  return { subject: 'Confirme seu e-mail no Litro', html, text };
+  return { subject: 'Confirme seu e-mail no Litre', html, text };
 }

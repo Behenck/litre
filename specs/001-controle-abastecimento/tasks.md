@@ -1,9 +1,9 @@
 ---
 
-description: "Task list for Litro — Controle de Abastecimento e Média de Consumo"
+description: "Task list for Litre — Controle de Abastecimento e Média de Consumo"
 ---
 
-# Tasks: Litro — Controle de Abastecimento e Média de Consumo
+# Tasks: Litre — Controle de Abastecimento e Média de Consumo
 
 **Input**: Design documents from `/specs/001-controle-abastecimento/`
 

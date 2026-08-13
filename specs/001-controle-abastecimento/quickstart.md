@@ -1,4 +1,4 @@
-# Quickstart — Litro
+# Quickstart — Litre
 
 **Plan**: [plan.md](./plan.md) | **Data model**: [data-model.md](./data-model.md)
 

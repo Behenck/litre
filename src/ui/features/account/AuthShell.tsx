@@ -23,7 +23,7 @@ export function AuthShell({ title, description, children, footer }: AuthShellPro
           <span className={styles.mark} aria-hidden="true">
             L
           </span>
-          <span className={styles.name}>Litro</span>
+          <span className={styles.name}>Litre</span>
         </div>
 
         <section className={styles.card}>

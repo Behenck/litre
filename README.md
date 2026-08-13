@@ -1,4 +1,4 @@
-# Litro
+# Litre
 
 Controle de abastecimento, média de consumo e custo por quilômetro dos seus veículos.
 
@@ -46,7 +46,7 @@ npm run dev             # http://localhost:3000
 | `LITRO_JWT_SECRET` | segredo que assina os tokens de sessão (mín. 32 caracteres) | — |
 | `LITRO_APP_URL` | base do link enviado no e-mail de confirmação | `http://localhost:3000` |
 | `RESEND_API_KEY` | chave da API do Resend | — |
-| `LITRO_MAIL_FROM` | remetente do e-mail de confirmação | `Litro <onboarding@resend.dev>` |
+| `LITRO_MAIL_FROM` | remetente do e-mail de confirmação | `Litre <onboarding@resend.dev>` |
 
 ## Funcionalidades
 

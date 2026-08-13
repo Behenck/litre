@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { AuthShell } from '@/ui/features/account/AuthShell';
 import { ResendVerificationForm } from '@/ui/features/account/ResendVerificationForm';
 
-export const metadata: Metadata = { title: 'Confirme seu e-mail — Litro' };
+export const metadata: Metadata = { title: 'Confirme seu e-mail — Litre' };
 
 interface PageProps {
   searchParams: Promise<{ email?: string; enviado?: string }>;
